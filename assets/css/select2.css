@@ -1,0 +1,686 @@
+.select2-container-multi .select2-choices {
+	border-color: #fff!important
+}
+.inbox-info-bar .select2-choices>div {
+	display: none
+}
+.inbox-info-bar .col-md-1, .inbox-info-bar .col-md-11 {
+	padding-left: 0;
+	padding-right: 0
+}
+.fileinput {
+	padding-top: 3px
+}
+.hidden {
+	display: none
+}
+.inbox-info-bar em {
+	position: absolute;
+	top: 6px;
+	right: 20px;
+	text-align: right;
+	font-style: normal
+}
+.email-reply-text>div {
+	border-left: 1px solid #D6D6D6;
+	padding-left: 10px;
+	margin-left: 50px;
+	color: #A9A9A9
+}
+.email-reply-text>:first-child {
+	padding-left: 45px
+}
+
+@media (max-width:1280px) {
+.inbox-info-bar, .inbox-message, .inbox-compose-footer {
+	margin-right: 0
+}
+.email-infobox {
+	display: none
+}
+}
+
+@media (max-width:1024px) {
+.inbox-side-bar {
+	display: none!important
+}
+.inbox-body .table-wrap {
+	margin-left: 0!important
+}
+.inbox-info-bar .col-md-1, .inbox-info-bar .col-md-11 {
+	padding-left: 26px;
+	padding-right: 26px
+}
+}
+.profile-pic {
+	text-align: right
+}
+.profile-pic>img {
+	border-radius: 0;
+	position: relative;
+	border: 5px solid #fff;
+	top: -30px;
+	left: 10px;
+	display: inline-block;
+	text-align: right;
+	z-index: 4;
+	max-width: 100px;
+	margin-bottom: -30px
+}
+.profile-carousel .carousel-inner {
+	max-height: 150px
+}
+.friends-list li {
+	margin-bottom: 10px;
+	margin-right: 3px;
+	padding: 0
+}
+.friends-list img {
+	width: 35px;
+	border: 1px solid #fff;
+	outline: 1px solid #bfbfbf
+}
+.profile-link-btn {
+	color: #999;
+	font-size: 14px
+}
+time.icon {
+	font-size: 14px;
+	display: block;
+	position: relative;
+	width: 35px;
+	height: 43px;
+	background-color: #fff;
+	margin: 3px auto;
+	border-radius: 7px;
+	box-shadow: 0 1px 0 #bdbdbd, 0 2px 0 #fff, 0 3px 0 #EEE9E9, 0 4px 0 #fff, 0 5px 0 #FFF, 0 0 0 1px #D3D3D3;
+	overflow: hidden
+}
+time.icon * {
+	display: block;
+	width: 100%;
+	font-size: 10px;
+	font-weight: 700;
+	font-style: normal;
+	text-align: center
+}
+time.icon strong {
+	position: absolute;
+	top: 0;
+	padding: 2px 0;
+	color: #fff;
+	background-color: #3a3633;
+	-webkit-box-shadow: 0 2px 0 #3a3633;
+	box-shadow: 0 2px 0 #3a3633;
+	border-radius: 6px 6px 0 0
+}
+time.icon em {
+	position: absolute;
+	bottom: 3px;
+	color: #3276b1
+}
+time.icon span {
+	width: 100%;
+	font-size: 15px;
+	letter-spacing: -.05em;
+	padding-top: 21px;
+	color: #2f2f2f
+}
+.user {
+	display: block;
+	float: left;
+	width: 170px;
+	margin: 0 15px 15px 0;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+.user img {
+	float: left;
+	width: 35px;
+	margin-right: 5px
+}
+.user .email {
+	color: #999;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+.search-results {
+	padding: 18px 5px
+}
+.search-results+.search-results {
+	border-top: 1px dashed #E3E3E3
+}
+.search-results>:first-child {
+	margin-bottom: 4px;
+	font-weight: 400
+}
+.search-results>:first-child a {
+	text-decoration: underline
+}
+.search-results .url {
+	font-style: normal;
+	font-size: 14px
+}
+.search-results img {
+	display: inline-block;
+	margin-top: 4px;
+	margin-right: 4px;
+	width: 80px
+}
+.search-results>div {
+	display: inline-block;
+	vertical-align: top
+}
+.search-results .note {
+	margin: 0;
+	line-height: normal
+}
+.search-results .note a {
+	text-decoration: none!important;
+	color: #333
+}
+.search-results .note a:hover {
+	color: #ed1c24
+}
+.select2-container {
+	margin: 0;
+	position: relative;
+	display: inline-block;
+	zoom: 1;
+*display:inline;
+	vertical-align: middle
+}
+.select2-container, .select2-drop, .select2-search, .select2-search input {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box
+}
+.select2-container .select2-choice {
+	display: block;
+	height: 32px;
+	padding: 0 0 0 8px;
+	overflow: hidden;
+	position: relative;
+	border: 1px solid #ccc;
+	white-space: nowrap;
+	line-height: 32px;
+	color: #444;
+	text-decoration: none;
+	background-clip: padding-box;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-color: #fff
+}
+.select2-container.select2-drop-above .select2-choice {
+	border-bottom-color: #ccc
+}
+.select2-container.select2-allowclear .select2-choice .select2-chosen {
+	margin-right: 42px
+}
+.select2-container .select2-choice>.select2-chosen {
+	margin-right: 26px;
+	display: block;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis
+}
+.select2-container .select2-choice abbr {
+	display: none;
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	right: 24px;
+	top: 8px;
+	font-size: 1px;
+	text-decoration: none;
+	border: 0;
+	cursor: pointer;
+	outline: 0
+}
+.select2-container.select2-allowclear .select2-choice abbr {
+	display: inline-block
+}
+.select2-container .select2-choice abbr:hover {
+	cursor: pointer
+}
+.select2-drop-mask {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	position: fixed;
+	left: 0;
+	top: 0;
+	min-height: 100%;
+	min-width: 100%;
+	height: auto;
+	width: auto;
+	opacity: 0;
+	z-index: 9998;
+	background: #fff;
+	filter: alpha(opacity=0)
+}
+.select2-drop {
+	margin-top: -1px;
+	width: 100%;
+	position: absolute;
+	z-index: 9999;
+	top: 100%;
+	background: #fff;
+	color: #000;
+	border: 1px solid #ccc;
+	border-top: 0;
+	-webkit-box-shadow: 0 4px 5px rgba(0,0,0,.15);
+	box-shadow: 0 4px 5px rgba(0,0,0,.15)
+}
+.select2-drop-auto-width {
+	border-top: 1px solid #ccc;
+	width: auto
+}
+.select2-drop-auto-width .select2-search {
+	padding-top: 4px
+}
+.select2-drop.select2-drop-above {
+	margin-bottom: 0;
+	border-top: 1px solid #5D98CC;
+	border-top-width: 3px;
+	border-bottom: 0;
+	-webkit-box-shadow: 0 -4px 5px rgba(0,0,0,.15);
+	box-shadow: 0 -4px 5px rgba(0,0,0,.15)
+}
+.select2-drop-active {
+	border: 1px solid #5D98CC;
+	border-top: 0;
+	border-bottom-width: 3px
+}
+.select2-drop.select2-drop-above.select2-drop-active {
+	border-top-width: 3px
+}
+.select2-container .select2-choice .select2-arrow {
+	display: inline-block;
+	width: 34px;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	border-left: 1px solid #ccc;
+	background-clip: padding-box;
+	background: #eee
+}
+.select2-container .select2-choice .select2-arrow b {
+	display: block;
+	width: 100%;
+	height: 100%;
+	display: inline-block;
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	position: relative;
+	font-size: 14px
+}
+.select2-container .select2-choice .select2-arrow b:before {
+	content: "\f107";
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	display: block
+}
+.select2-search {
+	display: inline-block;
+	width: 100%;
+	min-height: 26px;
+	margin: 0;
+	padding-left: 4px;
+	padding-right: 4px;
+	position: relative;
+	z-index: 10000;
+	white-space: nowrap
+}
+.select2-search input {
+	width: 100%;
+	height: auto!important;
+	min-height: 29px;
+	padding: 6px 20px 5px 10px;
+	margin: 0;
+	outline: 0;
+	font-family: sans-serif;
+	font-size: 1em;
+	border: 1px solid #aaa;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	background: #fff;
+	background: -webkit-gradient(linear, left bottom, left top, color-stop(.85, #fff), color-stop(.99, #eee));
+	background: -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%);
+	background: -moz-linear-gradient(center bottom, #fff 85%, #eee 99%);
+	background: linear-gradient(top, #fff 85%, #eee 99%)
+}
+.select2-search:before {
+	display: inline-block;
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	position: absolute;
+	content: "\f002";
+	top: 25%;
+	right: 10px;
+	color: #686868!important
+}
+.select2-drop.select2-drop-above .select2-search input {
+	margin-top: 4px
+}
+.select2-drop.select2-drop-above .select2-search:before {
+	top: 34%
+}
+.select2-search input.select2-active {
+	background: #fff url(../images/select2-spinner.gif) no-repeat 100%;
+	background: url(../images/select2-spinner.gif) no-repeat 100%, -webkit-gradient(linear, left bottom, left top, color-stop(.85, #fff), color-stop(.99, #eee));
+	background: url(../images/select2-spinner.gif) no-repeat 100%, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%);
+	background: url(../images/select2-spinner.gif) no-repeat 100%, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%);
+	background: url(../images/select2-spinner.gif) no-repeat 100%, linear-gradient(top, #fff 85%, #eee 99%)
+}
+.select2-container-active .select2-choice, .select2-container-active .select2-choices {
+	border: 1px solid #5D98CC;
+	outline: 0
+}
+.select2-dropdown-open .select2-choice {
+	border-bottom-color: transparent;
+	-webkit-box-shadow: 0 1px 0 #fff inset;
+	box-shadow: 0 1px 0 #fff inset;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	background-color: #fff
+}
+.select2-dropdown-open.select2-drop-above .select2-choice, .select2-dropdown-open.select2-drop-above .select2-choices {
+	border: 1px solid #5D98CC;
+	border-top-color: transparent
+}
+.select2-dropdown-open .select2-choice .select2-arrow {
+	background: 0 0;
+	border-left: 0;
+	filter: none
+}
+.select2-dropdown-open .select2-choice .select2-arrow b {
+	background-position: -18px 1px
+}
+.select2-results {
+	max-height: 200px;
+	padding: 0 0 0 4px;
+	margin: 4px 4px 4px 0;
+	position: relative;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-tap-highlight-color: rgba(0,0,0,0)
+}
+.select2-results ul.select2-result-sub {
+	margin: 0;
+	padding-left: 0
+}
+.select2-results ul.select2-result-sub>li .select2-result-label {
+	padding-left: 20px
+}
+.select2-results ul.select2-result-sub ul.select2-result-sub>li .select2-result-label {
+	padding-left: 40px
+}
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub>li .select2-result-label {
+	padding-left: 60px
+}
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub>li .select2-result-label {
+	padding-left: 80px
+}
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub>li .select2-result-label {
+	padding-left: 100px
+}
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub>li .select2-result-label {
+	padding-left: 110px
+}
+.select2-results ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub ul.select2-result-sub>li .select2-result-label {
+	padding-left: 120px
+}
+.select2-results li {
+	list-style: none;
+	display: list-item;
+	background-image: none
+}
+.select2-results li.select2-result-with-children>.select2-result-label {
+	font-weight: 700
+}
+.select2-results .select2-result-label {
+	padding: 3px 7px 4px;
+	margin: 0;
+	cursor: pointer;
+	min-height: 1em;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none
+}
+.select2-results .select2-highlighted {
+	background: #3276b1;
+	color: #fff
+}
+.select2-results li em {
+	background: #feffde;
+	font-style: normal
+}
+.select2-results .select2-highlighted em {
+	background: 0 0
+}
+.select2-results .select2-highlighted ul {
+	background: #fff;
+	color: #000
+}
+.select2-results .select2-no-results, .select2-results .select2-searching, .select2-results .select2-selection-limit {
+	background: #f4f4f4;
+	display: list-item;
+	padding: 3px 5px
+}
+.select2-no-results {
+	padding-left: 20px
+}
+.select2-no-results:before {
+	display: inline-block;
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: "\f05a";
+	margin-right: 5px
+}
+.select2-results .select2-disabled.select2-highlighted {
+	color: #666;
+	background: #f4f4f4;
+	display: list-item;
+	cursor: default
+}
+.select2-results .select2-disabled {
+	background: #f4f4f4;
+	display: list-item;
+	cursor: default
+}
+.select2-results .select2-selected {
+	display: none
+}
+.select2-more-results.select2-active {
+	background: #f4f4f4 url(../images/select2-spinner.gif) no-repeat 100%
+}
+.select2-more-results {
+	background: #f4f4f4;
+	display: list-item
+}
+.select2-container.select2-container-disabled .select2-choice {
+	background-color: #f4f4f4;
+	background-image: none;
+	border: 1px solid #ddd;
+	cursor: default
+}
+.select2-container.select2-container-disabled .select2-choice .select2-arrow {
+	background-color: #f4f4f4;
+	background-image: none;
+	border-left: 0
+}
+.select2-container.select2-container-disabled .select2-choice abbr {
+	display: none
+}
+.select2-container-multi .select2-choices {
+	height: auto!important;
+	height: 1%;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	border: 1px solid #ccc;
+	cursor: text;
+	overflow: hidden;
+	background-color: #fff
+}
+.select2-locked {
+	padding: 3px 5px!important
+}
+.select2-container-multi .select2-choices {
+	min-height: 26px
+}
+.select2-container-multi.select2-container-active .select2-choices {
+	border: 1px solid #5D98CC;
+	outline: 0
+}
+.select2-container-multi .select2-choices li {
+	float: left;
+	list-style: none
+}
+.select2-container-multi .select2-choices .select2-search-field {
+	margin: 0;
+	padding: 0;
+	white-space: nowrap
+}
+.select2-container-multi .select2-choices .select2-search-field input {
+	padding: 5px;
+	margin: 1px 0;
+	font-family: sans-serif;
+	font-size: 100%;
+	color: #666;
+	outline: 0;
+	border: 0;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	background: transparent!important
+}
+.select2-container-multi .select2-choices .select2-search-field input.select2-active {
+	background: #fff url(../images/select2-spinner.gif) no-repeat 100%!important
+}
+.select2-default {
+	color: #999!important
+}
+.select2-container-multi .select2-choices .select2-search-choice {
+	padding: 1px 28px 1px 8px;
+	margin: 4px 0 3px 5px;
+	position: relative;
+	line-height: 18px;
+	color: #fff;
+	cursor: default;
+	border: 1px solid #2a6395;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-color: #3276b1
+}
+.select2-container-multi .select2-choices .select2-search-choice .select2-chosen {
+	cursor: default
+}
+.select2-container-multi .select2-choices .select2-search-choice-focus {
+	opacity: .8
+}
+.select2-search-choice-close {
+	display: block;
+	min-width: 21px;
+	min-height: 20px;
+	position: absolute;
+	right: 3px;
+	top: 3px;
+	margin: 0;
+	padding: 0;
+	font-size: 15px;
+	line-height: 12px;
+	text-decoration: none!important;
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: 400;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale
+}
+.select2-search-choice-close:before {
+	color: #fff;
+	content: "\f057"
+}
+.select2-container-multi .select2-search-choice-close {
+	display: block;
+	top: 0;
+	right: 0;
+	padding: 3px 4px 3px 6px
+}
+.select2-container-multi .select2-search-choice-close:hover {
+	background: rgba(0,0,0,.3)
+}
+.select2-container-multi.select2-container-disabled .select2-choices {
+	background-color: #f4f4f4;
+	background-image: none;
+	border: 1px solid #ddd;
+	cursor: default
+}
+.select2-container-multi.select2-container-disabled .select2-choices .select2-search-choice {
+	padding: 3px 5px;
+	border: 1px solid #4a90cc;
+	background-image: none;
+	background-color: #86b4dd;
+	cursor: not-allowed
+}
+.select2-container-multi.select2-container-disabled .select2-choices .select2-search-choice .select2-search-choice-close {
+	display: none;
+	background: 0 0
+}
+.select2-result-selectable .select2-match, .select2-result-unselectable .select2-match {
+	text-decoration: underline
+}
+.select2-offscreen, .select2-offscreen:focus {
+	clip: rect(0 0 0 0)!important;
+	width: 1px!important;
+	height: 1px!important;
+	border: 0!important;
+	margin: 0!important;
+	padding: 0!important;
+	overflow: hidden!important;
+	position: absolute!important;
+	outline: 0!important;
+	left: 0!important;
+	top: 0!important
+}
+.select2-display-none {
+	display: none
+}
+.select2-measure-scrollbar {
+	position: absolute;
+	top: -10000px;
+	left: -10000px;
+	width: 100px;
+	height: 100px;
+	overflow: scroll
+}

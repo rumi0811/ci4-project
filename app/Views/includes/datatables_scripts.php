@@ -1,0 +1,2 @@
+<script src="<?php echo base_url(); ?>assets/4.5.1/js/datagrid/datatables/datatables.bundle.js"></script>
+<script src="<?php echo base_url(); ?>assets/4.5.1/js/datagrid/datatables/datatables.export.js"></script>

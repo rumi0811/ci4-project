@@ -1,0 +1,41 @@
+#dasplash, #dasplash2 {
+  position: absolute;
+  z-index: 20010;
+  width: 20px;
+  height: 20px;
+  background-color: #000;
+
+  background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,1) 10%,rgba(0,0,0,0) 100%);
+  background: radial-gradient(ellipse at center, rgba(0,0,0,1) 10%,rgba(0,0,0,0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#00000000',GradientType=1 );
+
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  transform-origin: center center;
+  transition: all 0.2s ease-out;
+}
+
+#dasplash2 {
+  z-index: 20000;
+  transition: all .1s ease-in;
+}
+
+#dasplash::after, #dasplash2::after  {
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.1 linear;
+}
+
+#dasplash.dasplash-white::after, #dasplash2.dasplash-white::after {
+  opacity: 1;
+  transition: all 0.15s ease-out;
+}

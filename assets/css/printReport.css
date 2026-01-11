@@ -1,0 +1,7 @@
+@media print {
+  body {transform: scale(1); font-size: 12px;}
+  table {
+    font-size: 12px;
+    border-spacing: 0;
+  }
+}
