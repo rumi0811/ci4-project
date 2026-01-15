@@ -35,7 +35,8 @@ class Customers extends MasterDataMongoController
             'address',
             'note'
         );
-        $this->datatable();
+
+        return $this->datatable();
     }
 
     protected function onBeforeSave($record)

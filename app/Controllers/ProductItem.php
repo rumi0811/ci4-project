@@ -230,12 +230,94 @@ class ProductItem extends MasterDataMongoController
             }
         }
 
+        // Load models for dropdown data
+        $mProductCategory = new MProductCategory();
+        $mUom = new MUom();
+        $mOutlet = new MOutlet();
+        $mSaleType = new MSaleType();
+
+        // Get dropdown data - Product Categories
+        $pos_item_categories = [];
+        $pos_item_categories[0] = '-- Select Product Category --';
+        $dataProductCategory = $mProductCategory->findAll([
+            'company_id' => $this->company_id,
+            'is_active' => 1,
+            '_deleted' => ['$ne' => true]
+        ]);
+        if ($dataProductCategory) {
+            foreach ($dataProductCategory as $row) {
+                $pos_item_categories[$row['product_category_id']] = $row['category_name'];
+            }
+        }
+
+        // Get dropdown data - UOM
+        $pos_uoms = [];
+        $pos_uoms[0] = '-- Select UOM --';
+        $dataUom = $mUom->findAll(['company_id' => $this->company_id]);
+        if ($dataUom) {
+            foreach ($dataUom as $row) {
+                $pos_uoms[$row['uom_id']] = $row['uom_code'];
+            }
+        }
+
+        // Get dropdown data - Outlets
+        $outlet_list = [];
+        $dataOutlet = $mOutlet->findAll(['company_id' => $this->company_id]);
+        if ($dataOutlet) {
+            foreach ($dataOutlet as $row) {
+                $outlet_list[$row['outlet_id']] = $row['outlet_name'];
+            }
+        }
+
+        // Get sale types
+        $sale_types = [];
+        $dataSaleType = $mSaleType->findAll();
+        if ($dataSaleType) {
+            foreach ($dataSaleType as $row) {
+                $sale_types[] = $row;
+            }
+        }
+
+        // ✅ ADD FIELD ALIASES untuk backward compatibility dengan view CI3
+        if (!empty($record)) {
+            // Alias product_id
+            $record['id_pos_item'] = $record['product_id'] ?? 0;
+
+            // Alias field names dengan prefix 'item_'
+            $record['item_barcode'] = $record['barcode'] ?? '';
+            $record['item_name'] = $record['product_name'] ?? '';
+            $record['item_description'] = $record['description'] ?? '';
+            $record['item_sku'] = $record['product_code'] ?? '';
+            $record['item_picture_cover'] = $record['picture'] ?? '';
+
+            // Alias category & uom dengan prefix 'id_pos_'
+            $record['id_pos_item_category'] = $record['product_category_id'] ?? 0;
+            $record['id_pos_uom'] = $record['uom_id'] ?? 0;
+        } else {
+            // Default values untuk new record
+            $record['id_pos_item'] = 0;
+            $record['item_barcode'] = '';
+            $record['item_name'] = '';
+            $record['item_description'] = '';
+            $record['item_sku'] = '';
+            $record['item_picture_cover'] = '';
+            $record['id_pos_item_category'] = 0;
+            $record['id_pos_uom'] = 0;
+        }
+
         // Prepare data for view
         $data['record'] = $record;
         $data['http_referer'] = previous_url() ?? base_url();
         $data['session_file_hash'] = md5(session()->get('user_id') . time());
         $data['controllerName'] = $this->controllerName;
         $data['fieldStructure'] = $this->fieldStructure;
+
+        // Dropdown data untuk view - nama variable sesuai dengan yang dipakai di view
+        $data['pos_item_categories'] = $pos_item_categories;
+        $data['pos_uoms'] = $pos_uoms; // View pakai 'pos_uoms'
+        $data['pos_outlets'] = $outlet_list;
+        $data['outlet_list'] = $outlet_list;
+        $data['sale_types'] = $sale_types;
 
         // Return view file
         return view('product_item/form_edit', $data);

@@ -183,8 +183,12 @@
                         <?php endif; ?>
                         <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
                     </ol>
+                    <?php if (isset($contents)): ?>
+                        <?= $contents ?>
+                    <?php else: ?>
+                        <?= $this->renderSection('content') ?>
+                    <?php endif; ?>
 
-                    <?= $this->renderSection('content') ?>
                 </main>
 
                 <!-- this overlay is activated only when mobile menu is triggered -->

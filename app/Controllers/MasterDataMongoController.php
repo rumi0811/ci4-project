@@ -249,13 +249,21 @@ abstract class MasterDataMongoController extends MYController
 			$this->fieldStructure = $model->fieldStructure;
 			$data["grid"] = $datagrid->generate();
 			// TODO: Fix form after helpers converted
-			$data["form"] = "<!-- Form temporarily disabled until helpers are converted -->";
+			$data["form"] = $this->formatFormToBootstrapModal($this->createFormEdit());
+			//$data["form"] = "<!-- Form temporarily disabled until helpers are converted -->";
 			//$data["form"] = $this->formatFormToBootstrapModal($this->createFormEdit());
 			$data['fieldStructure'] = $this->fieldStructure;
 			$data['formName'] = $this->formName;
 			$data['controllerName'] = $this->controllerName;
 			$this->dataPage = $data;
 			$data['extra_coding'] = $this->extra_coding();
+
+			// echo "<h3>Before return view</h3>";
+			// echo "<p>Data grid length: " . strlen($data["grid"]) . "</p>";
+			// echo "<p>Data form length: " . strlen($data["form"]) . "</p>";
+
+
+			//return view('general/master_data', $data);
 
 			$template_data["contents"] = view('general/master_data', $data);
 			return view('layout/main', $template_data);
@@ -264,12 +272,12 @@ abstract class MasterDataMongoController extends MYController
 
 	private function formatFormToBootstrapModal($formHtml)
 	{
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 		libxml_use_internal_errors(true); // Suppress warnings for invalid HTML
 		$doc->loadHTML($formHtml);
 		libxml_clear_errors();
 		// Use XPath to find all divs with class "form-footer"
-		$xpath = new DOMXPath($doc);
+		$xpath = new \DOMXPath($doc);
 		$nodes = $xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " form-footer ")]');
 		$buttons = '';
 		foreach ($nodes as $node) {
