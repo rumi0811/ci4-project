@@ -60,6 +60,7 @@
                     }
                     ?>
 
+
                     <div class="filter-message js-filter-message bg-success-600"></div>
                 </nav>
                 <!-- END PRIMARY NAVIGATION -->

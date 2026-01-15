@@ -485,7 +485,7 @@ class Form
             throw new \Exception('input with id ' . $name . ' already exists');
             exit();
         }
-        $strResult = '<input type="hidden" name="' . $name . '" id="' . $name . '_' . $this->formID . '" value="' . html_escape($value) . "\" " . $strAttr . " />\n";
+        $strResult = '<input type="hidden" name="' . $name . '" id="' . $name . '_' . $this->formID . '" value="' . esc($value) . "\" " . $strAttr . " />\n";
 
         if ($useInDetail) return $strResult;
         $this->formObject[$name] = array('string' => $strResult);
@@ -605,7 +605,7 @@ class Form
 
         $strCaption = ($this->caption == '') ? $this->caption : $this->caption;
 
-        if (!$this->ci->input->get_post('is-nav-ajax') && !$this->isFormOnly) {
+        if (!service("request")->getGetPost('is-nav-ajax') && !$this->isFormOnly) {
 
             $this->resultString .= '
       <div class="row">
@@ -662,7 +662,7 @@ class Form
             $this->resultString .= "
                 </form>\n";
         }
-        if (!$this->ci->input->get_post('is-nav-ajax') && !$this->isFormOnly) {
+        if (!service("request")->getGetPost('is-nav-ajax') && !$this->isFormOnly) {
             $this->resultString .= '
               </div>
             </div>
@@ -671,7 +671,7 @@ class Form
       </div>';
         }
 
-        if ($this->ci->input->get_post('is-nav-ajax')) {
+        if (service("request")->getGetPost('is-nav-ajax')) {
             echo $this->resultString;
             exit();
         }
@@ -1338,8 +1338,9 @@ class Form
             if (isset($this->navigationTableSource['table']) && !empty($this->navigationTableSource['table'])) {
                 $tableKey = (isset($this->navigationTableSource['key'])) ? $this->navigationTableSource['key'] : 'id';
 
-                $arrQueryMax = $this->ci->db->select_max($tableKey)->from($this->navigationTableSource['table'])->get()->row_array();
-                $arrQueryMin = $this->ci->db->select_min($tableKey)->from($this->navigationTableSource['table'])->get()->row_array();
+                $db = \Config\Database::connect();
+                $arrQueryMax = $db->table($this->navigationTableSource['table'])->selectMax($tableKey)->get()->getRowArray();
+                $arrQueryMin = $db->table($this->navigationTableSource['table'])->selectMin($tableKey)->get()->getRowArray();
                 $idMax = intval($arrQueryMax[$tableKey]);
                 $idMin = intval($arrQueryMin[$tableKey]);
 
@@ -1831,11 +1832,11 @@ class Form
                 $strJSstring .= "jQuery('#" . $arrEditor['id'] . "').summernote('code', '" . $arrEditor['code'] . "');";
         }
 
-        if ($this->ci->session->flashdata($this->formID . '_success_message') != '') {
-            $strJSstring .= "jQuery('#" . $this->formID . "_success_alert').append('" . $this->ci->session->flashdata($this->formID . '_success_message') . "');";
+        if (session()->getFlashdata($this->formID . '_success_message') != '') {
+            $strJSstring .= "jQuery('#" . $this->formID . "_success_alert').append('" . session()->getFlashdata($this->formID . '_success_message') . "');";
             $strJSstring .= "jQuery('#" . $this->formID . "_success_alert').show();";
-        } else if ($this->ci->session->flashdata($this->formID . '_error_message') != '') {
-            $strJSstring .= "jQuery('#" . $this->formID . "_error_alert').append('" . $this->ci->session->flashdata($this->formID . '_error_message') . "');";
+        } else if (session()->getFlashdata($this->formID . '_error_message') != '') {
+            $strJSstring .= "jQuery('#" . $this->formID . "_error_alert').append('" . session()->getFlashdata($this->formID . '_error_message') . "');";
             $strJSstring .= "jQuery('#" . $this->formID . "_error_alert').show();";
         }
 

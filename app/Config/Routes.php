@@ -6,7 +6,6 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// Test route TANPA filter (bisa dihapus nanti kalau sudah production)
 $routes->get('test-models', function () {
     try {
         $mProduct = new \App\Models\MProduct();
@@ -59,24 +58,78 @@ $routes->get('test-models', function () {
     }
 });
 
-// Auth routes (tanpa filter)
+// Authentication Routes (explicit for clean URLs)
 $routes->get('/', 'Auth::index');
 $routes->get('login', 'Auth::index');
 $routes->post('auth/login', 'Auth::login');
 $routes->get('auth/logout', 'Auth::logout');
 $routes->get('logout', 'Auth::logout');
 
-// Protected routes (dengan filter) - GANTI JADI HOME!
+// Dashboard (explicit route with auth filter)
 $routes->get('dashboard', 'Home::index', ['filter' => 'auth']);
 $routes->post('home/datatable', 'Home::datatable');
 
-// Product Item routes (AFTER line "post('home/datatable'...)")
+// Product Item routes (RESTORE!)
 $routes->group('product_item', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'ProductItem::index');
     $routes->post('save_data', 'ProductItem::saveData');
     $routes->post('delete_data', 'ProductItem::deleteData');
-    $routes->get('load_data', 'ProductItem::loadData');
-    $routes->get('get_datagrid_data', 'ProductItem::getDatagridData');
-    $routes->get('form_ingredient', 'ProductItem::formIngredient');
-    $routes->get('form_addon', 'ProductItem::formAddon');
+    $routes->get('(:any)', 'ProductItem::$1');
+    $routes->post('(:any)', 'ProductItem::$1');
+});
+
+// Tax routes (RESTORE!)
+$routes->group('tax', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Tax::index');
+    $routes->post('save_data', 'Tax::save_data');
+    $routes->post('delete_data', 'Tax::delete_data');
+    $routes->get('(:any)', 'Tax::$1');
+    $routes->post('(:any)', 'Tax::$1');
+});
+
+// Uom routes (ADD!)
+$routes->group('uom', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Uom::index');
+    $routes->post('save_data', 'Uom::save_data');
+    $routes->post('delete_data', 'Uom::delete_data');
+    $routes->get('(:any)', 'Uom::$1');
+    $routes->post('(:any)', 'Uom::$1');
+});
+
+// Product Category routes
+$routes->group('product_category', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'ProductCategory::index');
+    $routes->post('save_data', 'ProductCategory::save_data');
+    $routes->post('delete_data', 'ProductCategory::delete_data');
+    $routes->get('(:any)', 'ProductCategory::$1');
+    $routes->post('(:any)', 'ProductCategory::$1');
+});
+
+// Outlets routes
+$routes->group('outlets', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Outlets::index');
+    $routes->post('save_data', 'Outlets::save_data');
+    $routes->post('delete_data', 'Outlets::delete_data');
+    $routes->get('(:any)', 'Outlets::$1');
+    $routes->post('(:any)', 'Outlets::$1');
+});
+
+// Customers routes
+$routes->group('customers', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Customers::index');
+    $routes->post('save_data', 'Customers::save_data');
+    $routes->post('delete_data', 'Customers::delete_data');
+    $routes->get('(:any)', 'Customers::$1');
+    $routes->post('(:any)', 'Customers::$1');
+});
+
+// Supplier routes
+$routes->group('supplier', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Supplier::index');
+    $routes->get('edit/(:num)', 'Supplier::edit/$1');
+    $routes->post('save', 'Supplier::save');
+    $routes->get('deleteSupplier', 'Supplier::deleteSupplier');
+    $routes->post('deleteSupplier', 'Supplier::deleteSupplier');
+    $routes->get('(:any)', 'Supplier::$1');
+    $routes->post('(:any)', 'Supplier::$1');
 });
