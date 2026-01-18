@@ -82,6 +82,11 @@ class Mongo
      *
      * @usage $this->>m->listindexes('collection');
      */
+
+    /**
+     * Get MongoDB client connection
+     * For use by DatagridMongo
+     */
     public function listindexes($collection)
     {
         return $this->m->selectCollection($this->mongoConnectionInfos->db, $this->mongoConnectionInfos->prefix . $collection)->listIndexes();

@@ -206,6 +206,17 @@ abstract class MasterDataMongoController extends MYController
 					}
 				}
 				$datagrid->bindTable($this->tableName, $arrCriteria);
+
+				// CI4: Convert MongoDB ObjectId to string for DataTables compatibility
+				if (isset($datagrid->dataset['data'])) {
+					foreach ($datagrid->dataset['data'] as &$row) {
+						if (isset($row['_id']) && is_object($row['_id'])) {
+							$row['_id'] = (string) $row['_id'];
+						}
+					}
+					unset($row); // Break reference
+				}
+
 				if ($this->LookupData) {
 					$arrResult = &$datagrid->dataset['data'];
 					// print_r($this->LookupData);die();

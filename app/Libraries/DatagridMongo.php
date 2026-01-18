@@ -156,8 +156,9 @@ class DatagridMongo
         if (session()->get($this->pagingSessionKey)) {
             $this->pagingLength = session()->get($this->pagingSessionKey);
         }
-        $this->dbConnection = &$this->mongo_db;
-        // CI4: Session ID not needed in dataGridID
+        // CI4: Initialize MongoDB connection
+        $mongoLib = new \App\Libraries\Mongo();
+        $this->dbConnection = $mongoLib;
     }
 
     //parameter library mongo
@@ -718,6 +719,7 @@ class DatagridMongo
             if (count($arrCriteria) > 0) {
                 $this->dbConnection->where($arrCriteria);
             }
+            // CI4: MongoDB count - uses where() set above
             $totalData = $this->dbConnection->count($tableName);
             if ($totalData >= 0) {
                 $this->dataset = array(
@@ -826,12 +828,16 @@ class DatagridMongo
                 }
                 $this->dbConnection->select($arrFields);
             }
-            $this->dataset['data'] = $this->dbConnection->get($tableName);
+            // CI4: MongoDB find and convert to array
+            $cursor = $this->dbConnection->find($tableName);
+            $this->dataset['data'] = iterator_to_array($cursor);
             // print_r($this->dataset['data']);
             if ($arrWheres) {
                 $this->dbConnection->where($arrWheres);
+                $this->dataset['recordsFiltered'] = $this->dbConnection->count($tableName);
+            } else {
+                $this->dataset['recordsFiltered'] = $totalData;
             }
-            $this->dataset['recordsFiltered'] = $this->dbConnection->count($tableName);
         }
 
 
@@ -2298,7 +2304,7 @@ class DatagridMongo
             $strInitResponsive
             processing: true,
             serverSide: true,
-            ajax: { 'url' : '" . current_url() . "?ajax" . $this->dataGridID . "=1',
+            ajax: { 'url' : '" . site_url(uri_string()) . "?ajax" . $this->dataGridID . "=1',
                     'type' : 'POST',
                     'data': function ( d ) {
                         return $.extend( {}, d, {

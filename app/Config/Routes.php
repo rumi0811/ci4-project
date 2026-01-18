@@ -72,6 +72,7 @@ $routes->post('home/datatable', 'Home::datatable');
 // Product Item routes (RESTORE!)
 $routes->group('product_item', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'ProductItem::index');
+    $routes->post('/', 'ProductItem::index');  // ← TAMBAHKAN INI!
     $routes->post('save_data', 'ProductItem::saveData');
     $routes->post('delete_data', 'ProductItem::deleteData');
     $routes->get('(:any)', 'ProductItem::$1');
@@ -117,6 +118,7 @@ $routes->group('outlets', ['filter' => 'auth'], function ($routes) {
 // Customers routes
 $routes->group('customers', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'Customers::index');
+    $routes->post('/', 'Customers::index');  // ← TAMBAHKAN INI!
     $routes->post('save_data', 'Customers::save_data');
     $routes->post('delete_data', 'Customers::delete_data');
     $routes->get('(:any)', 'Customers::$1');

@@ -77,3 +77,9 @@ defined('EXIT_USER_INPUT')     || define('EXIT_USER_INPUT', 7);     // invalid u
 defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8);       // database error
 defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9);      // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125);    // highest automatically-assigned error code
+defined('USER_INTERNAL')   || define('USER_INTERNAL', 1);
+defined('USER_CUSTOMER')   || define('USER_CUSTOMER', 2);
+
+defined('ACTIVITY_LOGIN')       || define('ACTIVITY_LOGIN', 1);
+defined('ACTIVITY_LOGOUT')      || define('ACTIVITY_LOGOUT', 2);
+defined('ACTIVITY_TRANSACTION') || define('ACTIVITY_TRANSACTION', 3);
