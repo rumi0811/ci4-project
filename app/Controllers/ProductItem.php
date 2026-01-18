@@ -14,9 +14,11 @@ use App\Models\MSaleType;
  * Product CRUD management
  * Converted from CI3 Product_item.php
  * 
- * NOTES:
+ * CONVERSION NOTES:
  * - NO LOGIC CHANGES - hanya syntax CI3 → CI4
  * - Semua business logic preserved dari CI3
+ * - Menggunakan auto-generate form dari MasterDataMongoController
+ * - TIDAK pakai manual view seperti sebelumnya
  */
 class ProductItem extends MasterDataMongoController
 {
@@ -45,6 +47,7 @@ class ProductItem extends MasterDataMongoController
 
     public function index()
     {
+
         helper('smart_form');
 
         $this->hiddenGridField = [
@@ -183,9 +186,14 @@ class ProductItem extends MasterDataMongoController
         // Saat ini kosong seperti di CI3
     }
 
+
+    /**
+     * Create Form Edit
+     * EXACT conversion dari CI3 menggunakan Form library
+     */
     protected function createFormEdit()
     {
-        // Setup field structure
+        // Setup field structure - EXACT dari CI3
         $this->fieldStructure = [];
         $this->fieldStructure[$this->pk_id] = 'int';
         $this->fieldStructure['picture'] = 'file';
@@ -201,192 +209,162 @@ class ProductItem extends MasterDataMongoController
         $this->fieldStructure['uom_id'] = 'int';
         $this->fieldStructure['product_category_id'] = 'int';
 
-        // CI4: Prepare data for view
-        $record = [];
-
-        // Check if editing (has ID in request)
-        $id = $this->request->getPost($this->pk_id) ?? $this->request->getGet($this->pk_id);
-        if ($id) {
-            // Load existing record
-            $modelClassName = $this->getModelClassName($this->tableName);
-            $modelPath = "\\App\\Models\\{$modelClassName}";
-            $model = new $modelPath();
-            $result = $model->find(['product_id' => (int)$id]);
-            if ($result) {
-                $record = $result[0] ?? [];
-            }
-        }
-
-        // Set default values for new record
-        if (empty($record)) {
-            foreach ($this->fieldStructure as $field => $type) {
-                if ($type == 'int' || $type == 'boolean') {
-                    $record[$field] = 0;
-                } else if ($type == 'float' || $type == 'double') {
-                    $record[$field] = 0.0;
-                } else {
-                    $record[$field] = '';
-                }
-            }
-        }
-
-        // Load models for dropdown data
-        $mProductCategory = new MProductCategory();
-        $mUom = new MUom();
-        $mOutlet = new MOutlet();
-        $mSaleType = new MSaleType();
-
-        // Get dropdown data - Product Categories
-        $pos_item_categories = [];
-        $pos_item_categories[0] = '-- Select Product Category --';
-        $dataProductCategory = $mProductCategory->findAll([
-            'company_id' => $this->company_id,
-            'is_active' => 1,
-            '_deleted' => ['$ne' => true]
+        // CI4: Gunakan Form library (sama seperti Customers)
+        $form = new \App\Libraries\Form([
+            'action' => $this->controllerName . '/save_data',
+            'id' => $this->formName
         ]);
-        if ($dataProductCategory) {
-            foreach ($dataProductCategory as $row) {
-                $pos_item_categories[$row['product_category_id']] = $row['category_name'];
-            }
-        }
 
-        // Get dropdown data - UOM
-        $pos_uoms = [];
-        $pos_uoms[0] = '-- Select UOM --';
-        $dataUom = $mUom->findAll(['company_id' => $this->company_id]);
-        if ($dataUom) {
-            foreach ($dataUom as $row) {
-                $pos_uoms[$row['uom_id']] = $row['uom_code'];
-            }
-        }
+        $form->isFormOnly = true;
+        $form->caption = 'Add/Edit Product';
+        $form->addHidden($this->pk_id, '0');
+        $form->addHidden('modal_dialog_class', 'modal-xl modal-dialog-scrollable');
+        $form->addHidden('data_kit_json', '');
+        $form->addHidden('data_ingredient_json', '');
 
-        // Get dropdown data - Outlets
-        $outlet_list = [];
-        $dataOutlet = $mOutlet->findAll(['company_id' => $this->company_id]);
-        if ($dataOutlet) {
-            foreach ($dataOutlet as $row) {
-                $outlet_list[$row['outlet_id']] = $row['outlet_name'];
-            }
-        }
+        // Load models untuk dropdown
+        $mProductCategory = new \App\Models\MProductCategory();
+        $mUom = new \App\Models\MUom();
+        $mOutlet = new \App\Models\MOutlet();
+        $mSaleType = new \App\Models\MSaleType();
 
-        // Get sale types
-        $sale_types = [];
-        $dataSaleType = $mSaleType->findAll();
-        if ($dataSaleType) {
-            foreach ($dataSaleType as $row) {
-                $sale_types[] = $row;
-            }
-        }
+        // Add fields - EXACT seperti CI3
+        $form->addFile(
+            'Picture',
+            'picture',
+            '',
+            array(),
+            "string",
+            false,
+            true,
+            '<a class="delete_file_link" style="display: none; position: absolute; right: 16px; background-color: black; color: white; opacity: 0.8; padding: 4px 8px">X</a>
+        <div id="imageLogoContent_picture"></div>',
+            "",
+            true,
+            12,
+            ''
+        );
 
-        // ✅ ADD FIELD ALIASES untuk backward compatibility dengan view CI3
-        if (!empty($record)) {
-            // Alias product_id
-            $record['id_pos_item'] = $record['product_id'] ?? 0;
+        $form->addInput('Product Code/SKU', 'product_code', '', array(), "string", true, true, "", "", true, 3, '');
+        $form->addInput('Product Name', 'product_name', '', array(), "string", true, true, "", "", true, 6, '');
 
-            // Alias field names dengan prefix 'item_'
-            $record['item_barcode'] = $record['barcode'] ?? '';
-            $record['item_name'] = $record['product_name'] ?? '';
-            $record['item_description'] = $record['description'] ?? '';
-            $record['item_sku'] = $record['product_code'] ?? '';
-            $record['item_picture_cover'] = $record['picture'] ?? '';
-
-            // Alias category & uom dengan prefix 'id_pos_'
-            $record['id_pos_item_category'] = $record['product_category_id'] ?? 0;
-            $record['id_pos_uom'] = $record['uom_id'] ?? 0;
-        } else {
-            // Default values untuk new record
-            $record['id_pos_item'] = 0;
-            $record['item_barcode'] = '';
-            $record['item_name'] = '';
-            $record['item_description'] = '';
-            $record['item_sku'] = '';
-            $record['item_picture_cover'] = '';
-            $record['id_pos_item_category'] = 0;
-            $record['id_pos_uom'] = 0;
-        }
-
-        // Prepare data for view
-        $data['record'] = $record;
-        $data['http_referer'] = previous_url() ?? base_url();
-        $data['session_file_hash'] = md5(session()->get('user_id') . time());
-        $data['controllerName'] = $this->controllerName;
-        $data['fieldStructure'] = $this->fieldStructure;
-
-        // Dropdown data untuk view - nama variable sesuai dengan yang dipakai di view
-        $data['pos_item_categories'] = $pos_item_categories;
-        $data['pos_uoms'] = $pos_uoms; // View pakai 'pos_uoms'
-        $data['pos_outlets'] = $outlet_list;
-        $data['outlet_list'] = $outlet_list;
-        $data['sale_types'] = $sale_types;
-
-        // Return view file
-        return view('product_item/form_edit', $data);
-    }
-
-    /**
-     * Generate product form HTML
-     * Temporary solution - ideally use Form library
-     */
-    protected function generateProductForm()
-    {
-        // Load models
-        $mProductCategory = new MProductCategory();
-        $mUom = new MUom();
-        $mOutlet = new MOutlet();
-        $mSaleType = new MSaleType();
-
-        // Get dropdown data
-        $arrProductCategory = $this->generateDropdownOptions(
+        // Dropdown Product Category
+        $arrProductCategory = $this->generateDropdownFromModel(
             $mProductCategory,
-            ['company_id' => $this->company_id, 'is_active' => 1, '_deleted' => ['$ne' => true]],
+            [
+                'company_id' => $this->company_id,
+                'is_active' => 1,
+                '_deleted' => ['$ne' => true]
+            ],
             'product_category_id',
             'category_name'
         );
+        $form->addSelect("Product Category", 'product_category_id', $arrProductCategory, 0, array(), true, true, "", "", true, 3, '');
 
-        $arrUOM = $this->generateDropdownOptions(
+        $form->addTextarea('Description', 'description', '', array('rows' => 4), "string", false, true, "", "", true, 12, '');
+
+        $form->addInput('Kode Barcode', 'barcode', '', array(), "string", false, true, "", "<i class='fal fa-barcode'></i>", true, 6, '');
+
+        // Dropdown UOM
+        $arrUOM = $this->generateDropdownFromModel(
             $mUom,
             ['company_id' => $this->company_id],
             'uom_id',
             'uom_code'
         );
+        $form->addSelect("UoM", 'uom_id', $arrUOM, 0, array(), true, true, "", "", true, 3, '');
 
-        $arrOutlets = $this->generateDropdownOptions(
+        $this->fieldStructure['cogs_price'] = 'float';
+        $form->addInput('COGS Price', 'cogs_price', '', array(), "string", true, true, "", "", true, 3, '');
+
+        // Sale Price - check apakah ada sale types
+        $dataSaleType = $mSaleType->findAll();
+        if ($dataSaleType) {
+            $counter = 0;
+            foreach ($dataSaleType as $rowSaleType) {
+                $counter++;
+                $this->fieldStructure['sale_price_' . $rowSaleType['sale_type_id']] = 'float';
+                $form->addInput(
+                    'Unit Price (' . $rowSaleType['sale_type'] . ')',
+                    'sale_price_' . $rowSaleType['sale_type_id'],
+                    '',
+                    array(),
+                    "string",
+                    true,
+                    true,
+                    "",
+                    "",
+                    true,
+                    3,
+                    ''
+                );
+            }
+            if ($counter % 4 != 0) {
+                $form->addLiteral('', 'lblFiller', '<div style="clear: both"></div>', false);
+            }
+        } else {
+            $this->fieldStructure['sale_price'] = 'float';
+            $form->addInput('Unit Price', 'sale_price', '', array(), "string", true, true, "", "", true, 3, '');
+        }
+
+        $form->addCheckBoxToggle(
+            'Product Availability',
+            'is_all_outlet',
+            array(1 => 'Available to all outlets'),
+            true,
+            array(),
+            false,
+            true,
+            "",
+            "",
+            true,
+            6
+        );
+
+        // Dropdown Outlets (multiple)
+        $arrOutlets = $this->generateDropdownFromModel(
             $mOutlet,
             ['company_id' => $this->company_id],
             'outlet_id',
             'outlet_name'
         );
+        $this->fieldStructure['outlets'] = 'array';
+        $form->addSelect(
+            "Select Outlets",
+            'outlets',
+            $arrOutlets,
+            '',
+            array('multiple' => 'multiple'),
+            false,
+            true,
+            "",
+            "",
+            true,
+            6,
+            ''
+        );
 
-        // Get sale types
-        $dataSaleType = $mSaleType->findAll();
-        $arrSaleType = [];
-        if ($dataSaleType) {
-            foreach ($dataSaleType as $row) {
-                $arrSaleType[] = $row;
-            }
-        }
+        $form->addCheckBoxToggle('Is Active', 'is_active', array(1 => 'Yes'), false, array(), false, true, "", "", true, 3);
+        $form->addCheckBoxToggle('Product is for Sale', 'is_sale', array(1 => 'Yes'), false, array(), false, true, "", "", true, 3);
+        $form->addCheckBoxToggle('Can be Addon/Kit', 'is_addon', array(1 => 'Yes'), false, array(), false, true, "", "", true, 3);
+        $form->addCheckBoxToggle('Maintain Inventory', 'is_inventory', array(1 => 'Yes'), false, array(), false, true, "", "", true, 3);
 
-        // Build form HTML
-        $data = [
-            'pk_id' => $this->pk_id,
-            'formName' => $this->formName,
-            'controllerName' => $this->controllerName,
-            'arrProductCategory' => $arrProductCategory,
-            'arrUOM' => $arrUOM,
-            'arrOutlets' => $arrOutlets,
-            'arrSaleType' => $arrSaleType
-        ];
+        $form->addLiteral('', 'lblTab', view('general/product_edit_extra', []), false);
 
-        return view('product_item/form_edit', $data);
+        $form->addButton('btnSaveProduct', 'Save ', array(), true, "", "", "");
+        $form->addReset('btnCancel', 'Cancel', array('data-dismiss' => "modal"), true, "", "", "");
+
+        return $form->render();
     }
 
     /**
-     * Helper untuk generate dropdown options
+     * Helper untuk generate dropdown dari model
      */
-    protected function generateDropdownOptions($model, $criteria, $valueField, $labelField)
+    protected function generateDropdownFromModel($model, $criteria, $valueField, $labelField)
     {
         $cursor = $model->findAll($criteria);
         $options = [];
+        $options[0] = '-- Select --';
 
         if ($cursor) {
             foreach ($cursor as $row) {
@@ -399,6 +377,7 @@ class ProductItem extends MasterDataMongoController
 
     /**
      * Form untuk add/edit ingredient
+     * Converted dari CI3
      */
     public function formIngredient()
     {
@@ -421,7 +400,7 @@ class ProductItem extends MasterDataMongoController
             $mProduct,
             $arrCriteria,
             'product_id',
-            'product_code' // Will need to concatenate with product_name in view
+            'product_code'
         );
 
         $data = [
@@ -433,6 +412,7 @@ class ProductItem extends MasterDataMongoController
 
     /**
      * Form untuk add/edit addon
+     * Converted dari CI3
      */
     public function formAddon()
     {
@@ -462,5 +442,22 @@ class ProductItem extends MasterDataMongoController
         ];
 
         return view('product_item/form_addon', $data);
+    }
+
+    /**
+     * Helper untuk generate dropdown options
+     */
+    protected function generateDropdownOptions($model, $criteria, $valueField, $labelField)
+    {
+        $cursor = $model->findAll($criteria);
+        $options = [];
+
+        if ($cursor) {
+            foreach ($cursor as $row) {
+                $options[$row[$valueField]] = $row[$labelField];
+            }
+        }
+
+        return $options;
     }
 }

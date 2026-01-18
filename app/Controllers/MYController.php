@@ -388,93 +388,93 @@ class MYController extends Controller
     }
 
     /**
- * Temporary menu until ACL is fixed
- * CI4: This will be replaced with dynamic menu from database
- */
-protected function getTemporaryMenu()
-{
-    $html = '<ul id="js-nav-menu" class="nav-menu">';
-    
-    // Home
-    $html .= '<li>';
-    $html .= '  <a href="' . base_url('dashboard') . '" title="Dashboard">';
-    $html .= '    <i class="fal fa-home"></i>';
-    $html .= '    <span class="nav-link-text">Home</span>';
-    $html .= '  </a>';
-    $html .= '</li>';
-    
-    // Master Data with children
-    $html .= '<li>';
-    $html .= '  <a href="#" title="Master Data">';
-    $html .= '    <i class="fal fa-database"></i>';
-    $html .= '    <span class="nav-link-text">Master Data</span>';
-    $html .= '  </a>';
-    $html .= '  <ul>';
-    $html .= '    <li>';
-    $html .= '      <a href="' . base_url('product_item') . '" title="Products">';
-    $html .= '        <span class="nav-link-text">Products</span>';
-    $html .= '      </a>';
-    $html .= '    </li>';
-    $html .= '    <li>';
-    $html .= '      <a href="' . base_url('product_category') . '" title="Product Category">';
-    $html .= '        <span class="nav-link-text">Product Category</span>';
-    $html .= '      </a>';
-    $html .= '    </li>';
-    $html .= '    <li>';
-    $html .= '      <a href="' . base_url('master_satuan') . '" title="Master Satuan">';
-    $html .= '        <span class="nav-link-text">Master Satuan</span>';
-    $html .= '      </a>';
-    $html .= '    </li>';
-    $html .= '    <li>';
-    $html .= '      <a href="' . base_url('cashier_user') . '" title="Cashier User">';
-    $html .= '        <span class="nav-link-text">Cashier User</span>';
-    $html .= '      </a>';
-    $html .= '    </li>';
-    $html .= '  </ul>';
-    $html .= '</li>';
-    
-    // Gerai / Outlet
-    $html .= '<li>';
-    $html .= '  <a href="' . base_url('outlet') . '" title="Gerai / Outlet">';
-    $html .= '    <i class="fal fa-store"></i>';
-    $html .= '    <span class="nav-link-text">Gerai / Outlet</span>';
-    $html .= '  </a>';
-    $html .= '</li>';
-    
-    // Customers
-    $html .= '<li>';
-    $html .= '  <a href="' . base_url('customer') . '" title="Customers">';
-    $html .= '    <i class="fal fa-users"></i>';
-    $html .= '    <span class="nav-link-text">Customers</span>';
-    $html .= '  </a>';
-    $html .= '</li>';
-    
-    // Payment Configuration
-    $html .= '<li>';
-    $html .= '  <a href="' . base_url('payment_configuration') . '" title="Payment Configuration">';
-    $html .= '    <i class="fal fa-credit-card"></i>';
-    $html .= '    <span class="nav-link-text">Payment Configuration</span>';
-    $html .= '  </a>';
-    $html .= '</li>';
-    
-    // Reports
-    $html .= '<li>';
-    $html .= '  <a href="#" title="Reports">';
-    $html .= '    <i class="fal fa-chart-line"></i>';
-    $html .= '    <span class="nav-link-text">Reports</span>';
-    $html .= '  </a>';
-    $html .= '</li>';
-    
-    // Exit
-    $html .= '<li>';
-    $html .= '  <a href="' . base_url('logout') . '" title="Exit">';
-    $html .= '    <i class="fal fa-sign-out"></i>';
-    $html .= '    <span class="nav-link-text">Exit</span>';
-    $html .= '  </a>';
-    $html .= '</li>';
-    
-    $html .= '</ul>';
-    
-    return $html;
-}
+     * Temporary menu until ACL is fixed
+     * CI4: This will be replaced with dynamic menu from database
+     */
+    protected function getTemporaryMenu()
+    {
+        $html = '<ul id="js-nav-menu" class="nav-menu">';
+
+        // Home
+        $html .= '<li>';
+        $html .= '  <a href="' . base_url('dashboard') . '" title="Dashboard">';
+        $html .= '    <i class="fal fa-home"></i>';
+        $html .= '    <span class="nav-link-text">Home</span>';
+        $html .= '  </a>';
+        $html .= '</li>';
+
+        // Master Data with children
+        $html .= '<li>';
+        $html .= '  <a href="#" title="Master Data">';
+        $html .= '    <i class="fal fa-database"></i>';
+        $html .= '    <span class="nav-link-text">Master Data</span>';
+        $html .= '  </a>';
+        $html .= '  <ul>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('product_item') . '" title="Products">';
+        $html .= '        <span class="nav-link-text">Products</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('product_category') . '" title="Product Category">';
+        $html .= '        <span class="nav-link-text">Product Category</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('master_satuan') . '" title="Master Satuan">';
+        $html .= '        <span class="nav-link-text">Master Satuan</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('cashier_user') . '" title="Cashier User">';
+        $html .= '        <span class="nav-link-text">Cashier User</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '  </ul>';
+        $html .= '</li>';
+
+        // Gerai / Outlet
+        $html .= '<li>';
+        $html .= '  <a href="' . base_url('outlet') . '" title="Gerai / Outlet">';
+        $html .= '    <i class="fal fa-store"></i>';
+        $html .= '    <span class="nav-link-text">Gerai / Outlet</span>';
+        $html .= '  </a>';
+        $html .= '</li>';
+
+        // Customers
+        $html .= '<li>';
+        $html .= '  <a href="' . base_url('customers') . '" title="Customers">';
+        $html .= '    <i class="fal fa-users"></i>';
+        $html .= '    <span class="nav-link-text">Customers</span>';
+        $html .= '  </a>';
+        $html .= '</li>';
+
+        // Payment Configuration
+        $html .= '<li>';
+        $html .= '  <a href="' . base_url('payment_configuration') . '" title="Payment Configuration">';
+        $html .= '    <i class="fal fa-credit-card"></i>';
+        $html .= '    <span class="nav-link-text">Payment Configuration</span>';
+        $html .= '  </a>';
+        $html .= '</li>';
+
+        // Reports
+        $html .= '<li>';
+        $html .= '  <a href="#" title="Reports">';
+        $html .= '    <i class="fal fa-chart-line"></i>';
+        $html .= '    <span class="nav-link-text">Reports</span>';
+        $html .= '  </a>';
+        $html .= '</li>';
+
+        // Exit
+        $html .= '<li>';
+        $html .= '  <a href="' . base_url('logout') . '" title="Exit">';
+        $html .= '    <i class="fal fa-sign-out"></i>';
+        $html .= '    <span class="nav-link-text">Exit</span>';
+        $html .= '  </a>';
+        $html .= '</li>';
+
+        $html .= '</ul>';
+
+        return $html;
+    }
 }
