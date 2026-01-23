@@ -18,6 +18,8 @@ class Mongo
     private $limit = 0;
     private $options = array();
     private $mongoConnectionInfos;
+    public $db;
+    public $connection;
 
     function __construct($selectedDB = 'default')
     {
@@ -68,6 +70,11 @@ class Mongo
                     }
                     $this->mongoConnectionInfos->db = $dbInfo->db;
                     $this->mongoConnectionInfos->prefix = $dbInfo->prefix;
+
+                    // ========== TAMBAH INI ==========
+                    $this->db = $this->m->selectDatabase($dbInfo->db);
+                    $this->connection = $this->m;
+                    // ================================
                 }
             }
         } catch (\CodeIgniter\UnknownFileException $e) {

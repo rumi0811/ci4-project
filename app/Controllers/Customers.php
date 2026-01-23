@@ -10,6 +10,7 @@ class Customers extends MasterDataMongoController
     public function __construct()
     {
         parent::__construct('customers', 'm_customer');
+        $this->title = 'Customer';
         $this->set_unique_fields(['email_address' => 'Email address']);
     }
 
@@ -33,7 +34,12 @@ class Customers extends MasterDataMongoController
             'outlet_id',
             'outlet_name',
             'address',
-            'note'
+            'note',
+            'note',
+            'client_id',
+            'server_id',
+            'updatedAt',
+            '_deleted'
         );
 
         return $this->datatable();
@@ -56,6 +62,10 @@ class Customers extends MasterDataMongoController
         unset($this->fieldStructure['created_by']);
         unset($this->fieldStructure['modified']);
         unset($this->fieldStructure['modified_by']);
+        unset($this->fieldStructure['client_id']);
+        unset($this->fieldStructure['server_id']);
+        unset($this->fieldStructure['updatedAt']);
+        unset($this->fieldStructure['_deleted']);
 
         $form = new \App\Libraries\Form(array('action' => $this->controllerName . '/save_data', 'id' => $this->formName));
         $form->isFormOnly = true;

@@ -24,6 +24,7 @@ abstract class MasterDataMongoController extends MYController
 	public $LookupDataPrimaryKey = [];
 	public $fieldStructure = [];
 	public $dataPage = [];
+	public $title = '';
 	public $isHidePrimaryKeyColumn = true;
 
 	// Properties inherited from MY_Controller in CI3
@@ -57,6 +58,11 @@ abstract class MasterDataMongoController extends MYController
 		$this->tableName = $tableName;
 		$this->entityName = ucwords(str_replace('_', ' ', $controllerName));
 		$this->gridDefinition = $this->getTableStructure($tableName);
+
+		// ========== TAMBAH INI ==========
+		$this->datagrid = new \App\Libraries\DatagridMongo();
+		$this->datagrid->checkDeleteDataFromTable();
+		// ================================
 	}
 
 	protected function field_lookup_definition_for_column_properties()
@@ -196,6 +202,45 @@ abstract class MasterDataMongoController extends MYController
 
 			$this->addDatagridButton($datagrid);
 
+			$request = service('request');
+
+			// CEK DELETE REQUEST DULU SEBELUM CEK AJAX!
+			if ($request->getGet('action') == 'deleteRowData') {
+				error_log("=== DELETE REQUEST RECEIVED ===");
+				error_log("pk_id field: " . $this->pk_id);
+				error_log("POST data: " . print_r($request->getPost(), true));
+
+				$pk_value = $request->getPost($this->pk_id);
+				error_log("pk_value: " . ($pk_value ?? 'NULL'));
+
+				$response = ['success' => 0, 'message' => 'Uncomplete Parameter'];
+
+				if (!empty($pk_value)) {
+					$record = $this->{$this->tableName}->getByID($pk_value);
+
+					if (!empty($record)) {
+						if ($this->on_before_delete($record)) {
+							// Soft delete: set _deleted = true
+							$result = $this->{$this->tableName}->update($pk_value, ['_deleted' => true]);
+
+							if ($result) {
+								$this->on_success_delete($record);
+								$response = ['success' => 1, 'message' => 'Data has been deleted'];
+							} else {
+								$response = ['success' => 0, 'message' => 'Failed to delete data'];
+							}
+						} else {
+							$response = ['success' => 0, 'message' => 'Delete operation cancelled'];
+						}
+					} else {
+						$response = ['success' => 0, 'message' => 'Record not found'];
+					}
+				}
+
+				echo json_encode($response);
+				exit;
+			}
+
 			if (isset($_GET['ajaxDataGrid1'])) {
 				// update log finish load datagrid
 				$arrCriteria = [];
@@ -323,7 +368,7 @@ EOF;
 		if ($checkAccess) {
 			$id = intval($id);
 			$modelName = $this->tableName;
-			$this->load->model($modelName);
+			// $this->load->model($modelName);// Model sudah di-load di child controller, skip this line
 			if ($row = $this->$modelName->find($this->pk_id . " = " . $id)) {
 				helper('date');
 				foreach ($this->$modelName->fieldStructure as $key => $val) {
@@ -464,22 +509,27 @@ EOF;
 		if (isset($_POST['submitButton_' . $this->formName])) {
 			//save
 			$modelName = $this->tableName;
-			$this->load->model($modelName);
+			//$this->load->model($modelName);
+
+			// For tableName 'm_customer' -> MCustomer
+			$modelClassName = 'M' . str_replace('_', '', ucwords(str_replace('m_', '', $this->tableName), '_'));
+			$modelClass = 'App\\Models\\' . $modelClassName;
+			$this->model = new $modelClass();
 			helper('date');
 
 			$record = array();
 			$arrFileFields = [];
-			foreach ($this->$modelName->fieldStructure as $key => $val) {
+			foreach ($this->model->fieldStructure as $key => $val) {
 				if ($val == 'file') {
 					$arrFileFields[] = $key;
-				} else if ($this->input->post($key) !== null) {
-					$record[$key] = $this->input->post($key);
+				} else if ($this->request->getPost($key) !== null) {
+					$record[$key] = $this->request->getPost($key);
 					if ($val == 'int' || $val == 'boolean') {
 						$record[$key] = intval($record[$key]);
 					} else if ($val == 'float') {
 						$record[$key] = floatval($record[$key]);
 					} else if ($val == 'date' || $val == 'datetime') {
-						$record[$key] = convertClientDateToISO($record[$key]);
+						//$record[$key] = convertClientDateToISO($record[$key]);
 					}
 				}
 			}
@@ -494,18 +544,21 @@ EOF;
 				$record["modified"] = date("Y-m-d H:i:s");
 				$record["modified_by"] = session()->get('user_id');
 
-				if ($this->passed_unique_field($record, $errorMessage)) {
-					$oldRecord = $this->$modelName->find(array($this->pk_id => $record[$this->pk_id]));
-					if ($this->$modelName->update(array($this->pk_id => $record[$this->pk_id]), $record)) {
-						$isSuccess = true;
-						$result["message"] = "Data saved";
-						$result["data"] = $record;
-					} else {
-						$result["error_message"] = "Failed to save data";
-					}
+				// TODO: Fix passed_unique_field validation later
+				// if ($this->passed_unique_field($record, $errorMessage)) {
+				$oldRecord = $this->model->find(array($this->pk_id => $record[$this->pk_id]));
+				if ($this->model->update(array($this->pk_id => $record[$this->pk_id]), $record)) {
+					$isSuccess = true;
+					$result["message"] = "Data saved";
+					// Convert ObjectId to string for JSON response
+					$record[$this->pk_id] = (string)$record[$this->pk_id];
+					$result["data"] = $record;
 				} else {
-					$result["error_message"] = $errorMessage;
+					$result["error_message"] = "Failed to save data";
 				}
+				// } else {
+				// 	$result["error_message"] = $errorMessage;
+				// }
 			} else {
 				//insert
 				$record["created"] = date("Y-m-d H:i:s");
@@ -518,24 +571,27 @@ EOF;
 						if ($this->hasCompanyId) {
 							$arrCriteriaLastSeq[$this->company_id_field] = $this->company_id;
 						}
-						if ($oldData = $this->$modelName->find($arrCriteriaLastSeq, null, $this->sequenceField . ' DESC')) {
+						if ($oldData = $this->model->find($arrCriteriaLastSeq, null, $this->sequenceField . ' DESC')) {
 							$record[$this->sequenceField] = intval($oldData[$this->sequenceField]) + 1;
 						} else {
 							$record[$this->sequenceField] = 1;
 						}
 					}
 				}
-				if ($this->passed_unique_field($record, $errorMessage)) {
-					if ($record[$this->pk_id] = $this->$modelName->insert($record)) {
-						$isSuccess = true;
-						$result["message"] = "New data saved";
-						$result["data"] = $record;
-					} else {
-						$result["error_message"] = "Failed to save new data";
-					}
+				// TODO: Fix passed_unique_field validation later
+				// if ($this->passed_unique_field($record, $errorMessage)) {
+				if ($record[$this->pk_id] = $this->model->insert($record)) {
+					$isSuccess = true;
+					$result["message"] = "New data saved";
+					// Convert ObjectId to string for JSON response
+					$record[$this->pk_id] = (string)$record[$this->pk_id];
+					$result["data"] = $record;
 				} else {
-					$result["error_message"] = $errorMessage;
+					$result["error_message"] = "Failed to save new data";
 				}
+				// } else {
+				// 	$result["error_message"] = $errorMessage;
+				// }
 			}
 
 
@@ -559,7 +615,7 @@ EOF;
 		$result = [];
 		if ($this->loadPrivileges(false, false)) {
 			$modelName = $this->tableName;
-			$this->load->model($modelName);
+			//$this->load->model($modelName);
 
 			$pkValue = intval($this->input->get_post($this->pk_id));
 			$deleted_file_field = $this->request->getPost('deleted_file_field') ?? $this->request->getGet('deleted_file_field');

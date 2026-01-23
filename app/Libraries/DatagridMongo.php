@@ -532,7 +532,7 @@ class DatagridMongo
 
         $strKey = $key;
         if (is_array($key)) $strKey = implode(',', $key);
-        $this->rowButtonDelete = array('dataIndex' => $strKey, 'tableName' => $tableName, 'ser', 'button' => $strButton, 'fieldMapping' => $fieldMapping);
+        $this->rowButtonDelete = array('dataIndex' => $strKey, 'tableName' => $tableName, 'button' => $strButton, 'fieldMapping' => $fieldMapping);
     }
 
     public function addRowButtonModal($key, $url, $strTextButton = '<span class="glyphicon glyphicon-zoom-in"></span>  show Modal', $modalSize = 'large')
@@ -627,10 +627,26 @@ class DatagridMongo
 
     public function bindTable($tableName, $arrCriteria = array(), $arrFields = null)
     {
-        $this->checkDeleteDataFromTable();
+        error_log("=== bindTable CALLED ===");
+        error_log("tableName: " . $tableName);
 
         $this->tableName = $tableName;
-        if (service('request')->getGet('ajax' . $this->dataGridID)) {
+        $this->model = $this->getModelInstance($tableName);
+
+        $request = service('request');
+        $ajaxParam = $request->getPost('ajax' . $this->dataGridID) ?? $request->getGet('ajax' . $this->dataGridID);
+
+        error_log("ajaxParam value: " . ($ajaxParam ? $ajaxParam : 'NULL'));
+        error_log("dataGridID: " . $this->dataGridID);
+        error_log("GET ajax param: " . ($request->getGet('ajax' . $this->dataGridID) ?? 'NULL'));
+        error_log("POST ajax param: " . ($request->getPost('ajax' . $this->dataGridID) ?? 'NULL'));
+
+        if ($ajaxParam) {
+            error_log("=== INSIDE IF ajaxParam ===");
+
+            // CEK DELETE DULU SEBELUM GENERATE DATA!
+            $this->checkDeleteDataFromTable();
+
             $this->_generateDataFromTable($tableName, $arrCriteria, $arrFields);
 
             foreach ($this->arrColumnFilter as $dataIndex => $filter) {
@@ -644,16 +660,11 @@ class DatagridMongo
                         }
                     }
 
-                    /*$strSQL ="SELECT distinct(".$dataIndex.")as datafilteridx FROM ($strSQL) AS tmpQueryDatagrid";
-
-          $arrQuery = db_connect()->query($strSQL)->result_array();
-          foreach($arrQuery AS $row){
-            $arrSelectOption[$row['datafilteridx']] = $row['datafilteridx'];
-          }*/
-
                     $this->dataset["dataFilter_" . $dataIndex . "_" . $this->dataGridID] = $arrSelectOption;
                 }
             }
+        } else {
+            error_log("=== ajaxParam is FALSE/NULL ===");
         }
     }
 
@@ -904,17 +915,36 @@ class DatagridMongo
         }
     }
 
-    private function checkDeleteDataFromTable()
+    public function checkDeleteDataFromTable()
     {
-        if (service('request')->getPost('ajax' . $this->dataGridID) ?? service('request')->getGet('ajax' . $this->dataGridID)) {
-            if (service('request')->getGet('action') && (service('request')->getGet('action') == 'deleteRowData')) {
+        $request = service('request');
+
+        // DEBUG
+        error_log("=== checkDeleteDataFromTable CALLED ===");
+        error_log("ajax param: " . $request->getGet('ajax' . $this->dataGridID));
+        error_log("action param: " . $request->getGet('action'));
+
+        // Check if it's an AJAX request for this grid
+        $ajaxParam = $request->getPost('ajax' . $this->dataGridID) ?? $request->getGet('ajax' . $this->dataGridID);
+
+        if ($ajaxParam) {
+            $action = $request->getPost('action') ?? $request->getGet('action');
+
+            if ($action && $action == 'deleteRowData') {
+                error_log("=== DELETE ACTION DETECTED ===");
+
                 $arrResult = array('success' => 0, 'message' => '');
 
-                if (service('request')->getPost('tableName') && service('request')->getPost('dataIndex'))
+                if ($request->getPost('tableName') && $request->getPost('dataIndex')) {
+                    error_log("=== CALLING deleteRowData() ===");
                     $arrResult = $this->deleteRowData();
-                else {
+                } else {
+                    error_log("=== UNCOMPLETE PARAMETER ===");
+                    error_log("tableName: " . $request->getPost('tableName'));
+                    error_log("dataIndex: " . print_r($request->getPost('dataIndex'), true));
                     $arrResult['message'] = 'Uncomplete Parameter';
                 }
+
                 if (ENVIRONMENT == 'development') ini_set('display_errors', 1);
                 echo json_encode($arrResult);
                 die();
@@ -997,21 +1027,23 @@ class DatagridMongo
     private function deleteRowData()
     {
         if (ENVIRONMENT == 'development') ini_set('display_errors', 0);
-        $tableName = service('request')->getPost('tableName');
-        $arrData = service('request')->getPost('dataIndex');
+        $request = service('request');
+        $tableName = $request->getPost('tableName');
+        $arrData = $request->getPost('dataIndex');
+
         $arrCriteriaDelete = [];
         foreach ($arrData as $key => $value) {
-
-            //added by Dedy $fieldMapping
             $fieldName = $key;
             if (isset($this->rowButtonDelete['fieldMapping'])) {
-                //sebelum
                 if (isset($this->rowButtonDelete['fieldMapping'][$key])) {
                     $fieldName = $this->rowButtonDelete['fieldMapping'][$key];
                 }
             }
 
-            if (is_numeric($value)) {
+            // Convert to ObjectId if field is _id
+            if ($fieldName === '_id') {
+                $arrCriteriaDelete[$fieldName] = new \MongoDB\BSON\ObjectId($value);
+            } else if (is_numeric($value)) {
                 $arrCriteriaDelete[$fieldName] = intval($value);
             } else {
                 $arrCriteriaDelete[$fieldName] = $value;
@@ -1019,23 +1051,23 @@ class DatagridMongo
         }
 
         if ($this->onBeforeDeleteRowData($tableName, $arrCriteriaDelete)) {
-            $arrDeleteFieldUpdate = [];
-            $arrDeleteFieldUpdate['_deleted'] = true;
-            $this->dbConnection->set($arrDeleteFieldUpdate);
-            $this->dbConnection->where($arrCriteriaDelete);
-            //only update field _deleted to true
-            if (!$this->dbConnection->update($tableName))
-            //if (!$this->dbConnection->delete($tableName)) 
-            {
-                $arrResult = array('success' => 0, 'message' => '');
-                //if (ENVIRONMENT == 'development') {
-                //$arrError = db_connect()->error();
-                //$arrResult['message'] = $arrError['message'];
-                //}
-                //else $arrResult['message'] = 'Error In Deleting Process';
-                return $arrResult;
-            } else {
-                return array('success' => 1, 'message' => 'Data has been deleted');
+            try {
+                // Use MongoDB modern syntax
+                $mongo = new \App\Libraries\Mongo();
+                $collection = $mongo->db->selectCollection($tableName);
+
+                $result = $collection->updateOne(
+                    $arrCriteriaDelete,
+                    ['$set' => ['_deleted' => true]]
+                );
+
+                if ($result->getModifiedCount() > 0) {
+                    return array('success' => 1, 'message' => 'Data has been deleted');
+                } else {
+                    return array('success' => 0, 'message' => 'Error In Deleting Process');
+                }
+            } catch (\Exception $e) {
+                return array('success' => 0, 'message' => 'Error: ' . $e->getMessage());
             }
         } else {
             return array('success' => 0, 'message' => 'Data validation prevents deletion of this data');
@@ -1916,7 +1948,7 @@ class DatagridMongo
               if (result.value)
               {
                 jQuery.ajax({
-                  url : '" . current_url() . "?ajax" . $this->dataGridID . "=1&action=deleteRowData',
+                  url : window.location.href + '?ajax" . $this->dataGridID . "=1&action=deleteRowData',
                   type : 'POST',
                   data : $strData,
                   dataType: 'json',
@@ -1928,11 +1960,11 @@ class DatagridMongo
                   },
                   success : function(respond) {
                     if (respond.success == '1') {
-                      toastr['error'](respond.message);
+                      toastr['success'](respond.message);
                       reloadGrid();
                     }
                     else if (respond.success == 0) {
-                      toastr['success'](respond.message);
+                      toastr['error'](respond.message);
                     }
                   }
                 });
@@ -2660,5 +2692,19 @@ class DatagridMongo
         }
 
         return $arrTableHeader;
+    }
+
+    private function getModelInstance($tableName)
+    {
+        // Generate model class name from table name
+        // m_customer → MCustomer
+        $modelName = 'M' . str_replace('_', '', ucwords(str_replace('m_', '', $tableName), '_'));
+        $modelClass = "App\\Models\\{$modelName}";
+
+        if (class_exists($modelClass)) {
+            return new $modelClass();
+        }
+
+        return null;
     }
 }

@@ -352,13 +352,30 @@ class MyMongoModel
     return $replace;
   }
 
-  public function update($arrCriteria, $arrRecord)
+  public function update($id = null, $data = null): bool
   {
-    $this->mongo_db->set($arrRecord);
-    $this->mongo_db->where($arrCriteria);
-    $result = $this->mongo_db->updateOne($this->strTableName);
+    if ($id === null) {
+      return false;
+    }
 
-    return $result;
+    // Jika $data adalah string, convert menjadi array
+    if (is_string($data)) {
+      $data = [$data => true];
+    }
+
+    // Pastikan _id dalam format ObjectId
+    if (!($id instanceof \MongoDB\BSON\ObjectId)) {
+      $id = new \MongoDB\BSON\ObjectId($id);
+    }
+
+    // Update langsung tanpa panggil save() untuk avoid infinite loop
+    $result = $this->mongo->db->selectCollection($this->table)
+      ->updateOne(
+        ['_id' => $id],
+        ['$set' => $data]
+      );
+
+    return $result->getModifiedCount() > 0 || $result->getMatchedCount() > 0;
   }
 
   public function update_all($arrCriteria, $arrRecord)
