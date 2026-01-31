@@ -58,6 +58,18 @@ $routes->get('test-models', function () {
     }
 });
 
+$routes->get('test-sale-type', function () {
+    $mSaleType = new \App\Models\MSaleType();
+    $data = $mSaleType->findAll();
+    echo '<h2>Sale Type Data:</h2>';
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
+    echo '<br>Total: ' . (is_array($data) ? count($data) : 0);
+});
+
+
+
 // Authentication Routes (explicit for clean URLs)
 $routes->get('/', 'Auth::index');
 $routes->get('login', 'Auth::index');
@@ -73,7 +85,7 @@ $routes->post('home/datatable', 'Home::datatable');
 $routes->group('product_item', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'ProductItem::index');
     $routes->post('/', 'ProductItem::index');  // ← TAMBAHKAN INI!
-    $routes->post('save_data', 'ProductItem::saveData');
+    $routes->post('save_data', 'ProductItem::save_data');
     $routes->post('delete_data', 'ProductItem::deleteData');
     $routes->get('(:any)', 'ProductItem::$1');
     $routes->post('(:any)', 'ProductItem::$1');

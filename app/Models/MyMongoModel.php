@@ -170,11 +170,18 @@ class MyMongoModel
 
   public function find($varCondition = "", $varField = null, $varOrder = "")
   {
-    $arrResult = $this->findAll($varCondition, $varField, $varOrder, 1);
-    if ($arrResult != null && count($arrResult) == 1)
-      return $arrResult[0];
-    else
-      return null;
+    $cursor = $this->findAll($varCondition, $varField, $varOrder, 1);
+
+    if ($cursor != null) {
+      // Convert cursor to array
+      $arrResult = iterator_to_array($cursor);
+
+      if (count($arrResult) == 1) {
+        return reset($arrResult); // Get first element
+      }
+    }
+
+    return null;
   }
 
   public function findAll($varCondition = "", $varField = null, $varOrder = "", $intLimit = null, $page = 1, $autoIndexField = null /*set with field name */)
@@ -352,9 +359,9 @@ class MyMongoModel
     return $replace;
   }
 
-  public function update($id = null, $data = null): bool
+  public function update($criteria = null, $data = null): bool
   {
-    if ($id === null) {
+    if ($criteria === null) {
       return false;
     }
 
@@ -363,15 +370,33 @@ class MyMongoModel
       $data = [$data => true];
     }
 
-    // Pastikan _id dalam format ObjectId
-    if (!($id instanceof \MongoDB\BSON\ObjectId)) {
-      $id = new \MongoDB\BSON\ObjectId($id);
+    // Handle criteria
+    $whereClause = [];
+
+    if (is_array($criteria)) {
+      // Criteria sudah array, pakai langsung
+      $whereClause = $criteria;
+    } else {
+      // Criteria adalah value primary key
+      // Cek apakah primary key pakai ObjectId atau integer
+      $pkField = $this->strPKAutoIncrement ?? '_id';
+
+      if ($pkField === '_id') {
+        // Primary key adalah _id (ObjectId)
+        if (!($criteria instanceof \MongoDB\BSON\ObjectId)) {
+          $criteria = new \MongoDB\BSON\ObjectId($criteria);
+        }
+        $whereClause = ['_id' => $criteria];
+      } else {
+        // Primary key adalah field lain (integer atau string)
+        $whereClause = [$pkField => $criteria];
+      }
     }
 
     // Update langsung tanpa panggil save() untuk avoid infinite loop
-    $result = $this->mongo->db->selectCollection($this->table)
+    $result = $this->mongo_db->db->selectCollection($this->strTableName)
       ->updateOne(
-        ['_id' => $id],
+        $whereClause,
         ['$set' => $data]
       );
 

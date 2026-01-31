@@ -41,13 +41,50 @@ class ProductItem extends MasterDataMongoController
     protected function extraCoding()
     {
         $result = $this->GetUploadFolderJavascript();
-        $result .= view('general/product_extra_coding', $this->dataPage);
+
+        // FIX: Setup field structure untuk JavaScript generation
+        // Field structure harus sama seperti di createFormEdit()
+        $this->fieldStructure = [];
+        $this->fieldStructure[$this->pk_id] = 'int';
+        $this->fieldStructure['picture'] = 'file';
+        $this->fieldStructure['product_code'] = 'string';
+        $this->fieldStructure['product_name'] = 'string';
+        $this->fieldStructure['description'] = 'string';
+        $this->fieldStructure['barcode'] = 'string';
+        $this->fieldStructure['is_sale'] = 'boolean';
+        $this->fieldStructure['is_active'] = 'boolean';
+        $this->fieldStructure['is_addon'] = 'boolean';
+        $this->fieldStructure['is_inventory'] = 'boolean';
+        $this->fieldStructure['is_all_outlet'] = 'boolean';
+        $this->fieldStructure['uom_id'] = 'int';
+        $this->fieldStructure['product_category_id'] = 'int';
+
+        // Load m_sale_type untuk generate dynamic sale_price fields
+        $mSaleType = new \App\Models\MSaleType();
+        $dataSaleType = $mSaleType->findAll();
+        if ($dataSaleType) {
+            foreach ($dataSaleType as $rowSaleType) {
+                $this->fieldStructure['sale_price_' . $rowSaleType['sale_type_id']] = 'float';
+            }
+        }
+
+        // FIX: Pass variables yang dibutuhkan ke view
+        $data = $this->dataPage ?? [];
+        $data['fieldStructure'] = $this->fieldStructure;
+        $data['formName'] = $this->formName;
+        $data['controllerName'] = $this->controllerName;
+
+        $viewPath = APPPATH . 'Views/general/product_extra_coding.php';
+        log_message('debug', 'Loading view from: ' . $viewPath);
+        log_message('debug', 'View file exists: ' . (file_exists($viewPath) ? 'YES' : 'NO'));
+        log_message('debug', 'fieldStructure keys: ' . implode(', ', array_keys($this->fieldStructure)));
+
+        $result .= view('general/product_extra_coding', $data);
         return $result;
     }
 
     public function index()
     {
-
         helper('smart_form');
 
         $this->hiddenGridField = [
@@ -67,8 +104,37 @@ class ProductItem extends MasterDataMongoController
             'outlets',
             'addons',
             'ingredients',
-            'sale_prices'
+            'sale_prices',
+            'client_id',
+            'server_id',
+            'updatedAt',
+            '_deleted'
         ];
+
+        // Setup fieldStructure untuk editFormProduct
+        $this->fieldStructure = [];
+        $this->fieldStructure[$this->pk_id] = 'int';
+        $this->fieldStructure['picture'] = 'file';
+        $this->fieldStructure['product_code'] = 'string';
+        $this->fieldStructure['product_name'] = 'string';
+        $this->fieldStructure['description'] = 'string';
+        $this->fieldStructure['barcode'] = 'string';
+        $this->fieldStructure['is_sale'] = 'boolean';
+        $this->fieldStructure['is_active'] = 'boolean';
+        $this->fieldStructure['is_addon'] = 'boolean';
+        $this->fieldStructure['is_inventory'] = 'boolean';
+        $this->fieldStructure['is_all_outlet'] = 'boolean';
+        $this->fieldStructure['uom_id'] = 'int';
+        $this->fieldStructure['product_category_id'] = 'int';
+
+        // Dynamic sale_price fields
+        $mSaleType = new MSaleType();
+        $dataSaleType = $mSaleType->findAll();
+        if ($dataSaleType) {
+            foreach ($dataSaleType as $rowSaleType) {
+                $this->fieldStructure['sale_price_' . $rowSaleType['sale_type_id']] = 'float';
+            }
+        }
 
         return $this->datatable();
     }
@@ -306,6 +372,11 @@ class ProductItem extends MasterDataMongoController
             $this->fieldStructure['sale_price'] = 'float';
             $form->addInput('Unit Price', 'sale_price', '', array(), "string", true, true, "", "", true, 3, '');
         }
+
+
+        // Debug: Log fieldStructure
+        log_message('debug', 'ProductItem fieldStructure: ' . print_r($this->fieldStructure, true));
+
 
         $form->addCheckBoxToggle(
             'Product Availability',

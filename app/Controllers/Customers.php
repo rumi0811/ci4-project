@@ -42,6 +42,109 @@ class Customers extends MasterDataMongoController
             '_deleted'
         );
 
+        $this->extraScript = '<script>
+// Set reloadGrid function
+var reloadGridFunc = function() {
+    jQuery("#DataGrid1").DataTable().ajax.reload(null, false);
+};
+
+window.reloadGrid = reloadGridFunc;
+
+if (typeof(top) !== "undefined" && top !== window) {
+    top.reloadGrid = reloadGridFunc;
+}
+
+if (typeof(top) !== "undefined" && typeof(top.parent) !== "undefined" && top.parent !== null) {
+    try {
+        top.parent.reloadGrid = reloadGridFunc;
+    } catch(e) {}
+}
+
+if (typeof(parent) !== "undefined" && parent !== window) {
+    try {
+        parent.reloadGrid = reloadGridFunc;
+    } catch(e) {}
+}
+
+// ========== TAMBAH INI: FIX EDIT FORM ==========
+// Override editForm to load data for edit
+var originalEditForm = window.editForm || function() {};
+
+window.editForm = function(id) {
+    $("#modal_panel_edit_popup").modal();
+    
+    if (id == 0) {
+        // Add new - reset form
+        $("#form1 [name=\'customer_id\']").val("");
+        $("#form1 [name=\'company_id\']").val("");
+        $("#form1 [name=\'customer_name\']").val("");
+        $("#form1 [name=\'email_address\']").val("");
+        $("#form1 [name=\'mobile_phone\']").val("");
+        $("#form1 [name=\'address\']").val("");
+        $("#form1 [name=\'register_date\']").val("");
+        $("#form1 [name=\'expiry_date\']").val("");
+        $("#form1 [name=\'note\']").val("");
+        $("#form1 [name=\'is_active\']").prop("checked", false);
+        $("#form1 .select2").trigger("change");
+        if ($("#form1 .summernote").length > 0) {
+            $("#form1 .summernote").summernote("code", "");
+        }
+        
+        $("#modalLoadingInfoEditPopup").css("display", "none");
+    } else {
+        // Edit - load data
+        $("#modalLoadingInfoEditPopup").css("display", "block");
+        
+        var url = "' . base_url('customers/edit') . '/" + id;
+        
+        $.get(url, function(data) {
+            if (typeof(data) === "string") {
+                data = JSON.parse(data);
+            }
+            
+            if (data.error_message) {
+                toastr["error"](data.error_message);
+                $("#modal_panel_edit_popup").modal("hide");
+            } else {
+                // Populate form
+                $("#form1 [name=\'customer_id\']").val(data.customer_id || "");
+                $("#form1 [name=\'company_id\']").val(data.company_id || "");
+                $("#form1 [name=\'customer_name\']").val(data.customer_name || "");
+                $("#form1 [name=\'email_address\']").val(data.email_address || "");
+                $("#form1 [name=\'mobile_phone\']").val(data.mobile_phone || "");
+                $("#form1 [name=\'address\']").val(data.address || "");
+                $("#form1 [name=\'register_date\']").val(data.register_date || "");
+                $("#form1 [name=\'expiry_date\']").val(data.expiry_date || "");
+                $("#form1 [name=\'note\']").val(data.note || "");
+                
+                if (data.is_active == 1) {
+                    $("#form1 [name=\'is_active\']").prop("checked", true);
+                } else {
+                    $("#form1 [name=\'is_active\']").prop("checked", false);
+                }
+                
+                $("#form1 .select2").trigger("change");
+                
+                if ($("#form1 .summernote").length > 0 && data.note) {
+                    $("#form1 .summernote").summernote("code", data.note);
+                }
+            }
+        })
+        .fail(function() {
+            toastr["error"]("Failed to load data");
+            $("#modal_panel_edit_popup").modal("hide");
+        })
+        .always(function() {
+            $("#modalLoadingInfoEditPopup").css("display", "none");
+        });
+    }
+};
+// ========== END FIX ==========
+
+console.log("editForm override applied");
+</script>';
+        // ================================
+
         return $this->datatable();
     }
 

@@ -2007,7 +2007,7 @@ class DatagridMongo
 
                 if ($(this).attr('editor-id-dest') !== undefined) {
                   var editorEl = $(this).attr('editor-id-dest');
-                  $('#'+editorEl).code(data[$(this).attr('name')]);
+                  $('#'+editorEl).summernote('code', data[$(this).attr('name')]);
                 }
 
               }

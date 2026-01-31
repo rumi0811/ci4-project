@@ -26,6 +26,7 @@ abstract class MasterDataMongoController extends MYController
 	public $dataPage = [];
 	public $title = '';
 	public $isHidePrimaryKeyColumn = true;
+	protected $extraScript = '';
 
 	// Properties inherited from MY_Controller in CI3
 	public $tableName;
@@ -314,6 +315,10 @@ abstract class MasterDataMongoController extends MYController
 			$this->dataPage = $data;
 			$data['extra_coding'] = $this->extra_coding();
 
+			if (!empty($this->extraScript)) {
+				$data['extra_coding'] .= $this->extraScript;
+			}
+
 			// echo "<h3>Before return view</h3>";
 			// echo "<p>Data grid length: " . strlen($data["grid"]) . "</p>";
 			// echo "<p>Data form length: " . strlen($data["form"]) . "</p>";
@@ -367,16 +372,23 @@ EOF;
 		$checkAccess = $this->loadPrivileges(false, false);
 		if ($checkAccess) {
 			$id = intval($id);
-			$modelName = $this->tableName;
-			// $this->load->model($modelName);// Model sudah di-load di child controller, skip this line
-			if ($row = $this->$modelName->find($this->pk_id . " = " . $id)) {
+
+			// CI4: Get model instance (sama kayak di save_data)
+			$modelClassName = 'M' . str_replace('_', '', ucwords(str_replace('m_', '', $this->tableName), '_'));
+			$modelClass = 'App\\Models\\' . $modelClassName;
+			$this->model = new $modelClass();
+
+			// Find by primary key
+			$criteria = [$this->pk_id => $id];
+			if ($row = $this->model->find($criteria)) {
 				helper('date');
-				foreach ($this->$modelName->fieldStructure as $key => $val) {
+				foreach ($this->model->fieldStructure as $key => $val) {
 					if (!in_array($key, $this->excludeFields)) {
 						if ($val == 'date' || $val == 'datetime') {
 							if (isset($row[$key])) {
 								if ($row[$key] != '') {
-									$row[$key] = convertISODateToClientDate($row[$key]);
+									// $row[$key] = convertISODateToClientDate($row[$key]);
+									$row[$key] = $row[$key]; // Keep original date for now
 								} else {
 									$row[$key] = '';
 								}
@@ -544,10 +556,11 @@ EOF;
 				$record["modified"] = date("Y-m-d H:i:s");
 				$record["modified_by"] = session()->get('user_id');
 
-				// TODO: Fix passed_unique_field validation later
-				// if ($this->passed_unique_field($record, $errorMessage)) {
-				$oldRecord = $this->model->find(array($this->pk_id => $record[$this->pk_id]));
-				if ($this->model->update(array($this->pk_id => $record[$this->pk_id]), $record)) {
+				// customer_id is integer, not ObjectId
+				$pkValue = intval($record[$this->pk_id]);
+
+				$oldRecord = $this->model->find([$this->pk_id => $pkValue]);
+				if ($this->model->update([$this->pk_id => $pkValue], $record)) {  // ← Criteria as array
 					$isSuccess = true;
 					$result["message"] = "Data saved";
 					// Convert ObjectId to string for JSON response

@@ -17,8 +17,8 @@
 
     $('#js-page-content').smartPanel({
         onRefresh: function() {
-            if (typeof(top.parent.reloadGrid) == 'function') {
-                top.parent.reloadGrid();
+            if (typeof(reloadGrid) == 'function') {
+                reloadGrid();
             }
         }
     });
@@ -195,8 +195,8 @@
                                             $(modalPanelActive[0]).modal('hide');
                                         }
 
-                                        if (typeof(top.parent.reloadGrid) == 'function') {
-                                            top.parent.reloadGrid();
+                                        if (typeof(reloadGrid) == 'function') {
+                                            reloadGrid();
                                         }
                                     }
                                 })
@@ -222,8 +222,8 @@
                                             modalPanelActive.modal('hide');
                                         }
 
-                                        if (typeof(top.parent.reloadGrid) == 'function') {
-                                            top.parent.reloadGrid();
+                                        if (typeof(reloadGrid) == 'function') {
+                                            reloadGrid();
                                         }
                                     }
                                 })
@@ -284,8 +284,8 @@
                             toastr['success'](data.message);
                             $('#modal_panel_upload_data').modal('hide');
 
-                            if (typeof(top.parent.reloadGrid) == 'function') {
-                                top.parent.reloadGrid();
+                            if (typeof(reloadGrid) == 'function') {
+                                reloadGrid();
                             }
                         }
                     })

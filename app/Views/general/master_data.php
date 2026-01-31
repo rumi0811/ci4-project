@@ -60,6 +60,30 @@
 		});
 
 
+		// Event listener untuk ProductItem button Save
+		$("#btnSaveProduct_form1").on("click", function(e) {
+			if (typeof tableDt_DataGrid1 !== 'undefined' && typeof tableDt_DataGrid2 !== 'undefined') {
+				var dataGrid1 = tableDt_DataGrid1.rows().data();
+				var dataGrid2 = tableDt_DataGrid2.rows().data();
+				var data1 = [];
+				var data2 = [];
+				for (var i = 0; i < dataGrid1.length; i++) {
+					delete dataGrid1[i].action;
+					data1.push(dataGrid1[i]);
+				}
+				for (var i = 0; i < dataGrid2.length; i++) {
+					delete dataGrid2[i].action;
+					data2.push(dataGrid2[i]);
+				}
+				$('#data_kit_json_form1').val(JSON.stringify(data1));
+				$('#data_ingredient_json_form1').val(JSON.stringify(data2));
+			}
+			SaveConfirmationFormAndSubmit(e, $('#form1'), 'Save', "Do you want to save this data?", null, true);
+		});
+
+
+
+
 
 		$('.delete_file_link').click(function(e) {
 			elem = $(this).closest('div.input-group').next().children("input[type='file']");
@@ -122,14 +146,15 @@
 			echo "\n";
 			?>
 
-			$("#form1 .summernote").code('');
+			//$("#form1 .summernote").summernote('code', '');
 
 			$('#form1').removeClass('was-validated');
 		} else {
 			$("#modalLoadingInfoEditPopup").css("display", "block");
 			url = "<?php echo base_url() . $controllerName; ?>/edit/" + id;
 			var jqxhr = $.get(url, function(data) {
-					var obj = $.parseJSON(data);
+					//var obj = $.parseJSON(data);
+					var obj = (typeof data === 'string') ? $.parseJSON(data) : data;
 					if (typeof(obj.error_message) != 'undefined') {
 						toastr['error'](obj.error_message);
 						$("#modal_panel_edit_popup").modal('hide');
@@ -159,6 +184,19 @@
 						echo '					$("#' . $formName . ' .select2").trigger("change");';
 						echo "\n";
 						?>
+						// ========================================
+						// SEKAR FIX 2026-01-31: Populate sale_prices
+						// ========================================
+						if (obj.sale_prices && obj.sale_prices.length > 0) {
+							console.log('🔥 SEKAR: Populating sale_prices', obj.sale_prices);
+							for (var i = 0; i < obj.sale_prices.length; i++) {
+								var sp = obj.sale_prices[i];
+								var fieldId = 'sale_price_' + sp.sale_type_id + '_form1';
+								console.log('🔥 SEKAR: Setting', fieldId, '=', sp.sale_price);
+								$('#' + fieldId).val(sp.sale_price);
+							}
+						}
+
 						$('#form1').addClass('was-validated');
 					}
 				})
