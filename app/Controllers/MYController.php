@@ -45,6 +45,7 @@ class MYController extends Controller
 
     public function __construct()
     {
+
         // CI4: parent constructor called automatically
         helper('menu_helper');
         $this->company_id = session()->get('company_id');
@@ -428,6 +429,11 @@ class MYController extends Controller
         $html .= '    <li>';
         $html .= '      <a href="' . base_url('cashier_user') . '" title="Cashier User">';
         $html .= '        <span class="nav-link-text">Cashier User</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('user_type') . '" title="User Type">';
+        $html .= '        <span class="nav-link-text">User Type</span>';
         $html .= '      </a>';
         $html .= '    </li>';
         $html .= '  </ul>';

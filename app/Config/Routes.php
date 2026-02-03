@@ -147,3 +147,26 @@ $routes->group('supplier', ['filter' => 'auth'], function ($routes) {
     $routes->get('(:any)', 'Supplier::$1');
     $routes->post('(:any)', 'Supplier::$1');
 });
+
+
+$routes->group('user_type', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'UserType::index');
+    $routes->post('/', 'UserType::index');
+    $routes->post('save_data', 'UserType::save_data');
+    $routes->post('delete_data', 'UserType::delete_data');
+    $routes->get('(:any)', 'UserType::$1');
+    $routes->post('(:any)', 'UserType::$1');
+});
+
+$routes->group('group', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Group::index');
+    $routes->post('/', 'Group::index');
+    $routes->get('edit/(:num)', 'Group::edit/$1');
+    $routes->post('save_data', 'Group::save_data');
+    $routes->get('privilege/(:num)', 'Group::privilege/$1');
+    $routes->post('save_privilege', 'Group::save_privilege');
+    $routes->get('member/(:num)', 'Group::member/$1');
+    $routes->get('member_list/(:num)', 'Group::member_list/$1');
+    $routes->get('(:any)', 'Group::$1');
+    $routes->post('(:any)', 'Group::$1');
+});

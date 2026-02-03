@@ -2,9 +2,10 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
+use App\Controllers\MYController;
 
-class Dashboard extends Controller
+
+class Dashboard extends MYController
 {
     public function __construct()
     {
@@ -13,12 +14,30 @@ class Dashboard extends Controller
 
     public function index()
     {
-        // Check if user is logged in
+        // Test 1: Cek login
         if (!session()->get('logged_in')) {
             return redirect()->to('login');
         }
 
-        // Prepare data for layout
+        // Test 2: Log basic info
+        log_message('debug', '🔥 SEKAR: Dashboard index() called');
+
+        // Test 3: Cek apakah method getTemporaryMenu exists
+        if (method_exists($this, 'getTemporaryMenu')) {
+            log_message('debug', '🔥 SEKAR: getTemporaryMenu EXISTS');
+
+            try {
+                $menuHtml = $this->getTemporaryMenu();
+                log_message('debug', '🔥 SEKAR: getTemporaryMenu returned: ' . gettype($menuHtml));
+            } catch (\Exception $e) {
+                log_message('error', '🔥 SEKAR ERROR: ' . $e->getMessage());
+                $menuHtml = '<ul id="js-nav-menu" class="nav-menu"><li>ERROR</li></ul>';
+            }
+        } else {
+            log_message('error', '🔥 SEKAR: getTemporaryMenu NOT EXISTS!');
+            $menuHtml = '<ul id="js-nav-menu" class="nav-menu"><li>METHOD NOT FOUND</li></ul>';
+        }
+
         $data = [
             'title' => 'Dashboard - IKON POS',
             'currentPage' => [
@@ -27,12 +46,10 @@ class Dashboard extends Controller
                 'parent_menu_name' => '',
                 'parent_menu_file_name' => ''
             ],
-            'menu_generate' => $this->generateMenu(),
-            'form' => '',
-            'grid' => '',
+            'menu_generate' => $menuHtml,
         ];
 
-        // Return view with layout
+        log_message('debug', '🔥 SEKAR: About to render view');
         return view('dashboard/index', $data);
     }
 

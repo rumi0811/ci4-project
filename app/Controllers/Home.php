@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Controllers\BaseController;
+// use App\Controllers\BaseController;
+use App\Controllers\MYController;
 use App\Models\MProductCategory;
 use App\Models\MUom;
 use App\Models\MOutlet;
@@ -10,7 +11,8 @@ use App\Models\MSaleType;
 use App\Models\MSales;
 use App\Models\MCashier;
 
-class Home extends BaseController
+//class Home extends BaseController
+class Home extends MYController
 {
     protected $formName = 'form1';
 
@@ -34,12 +36,17 @@ class Home extends BaseController
         $data['title'] = 'Dashboard - IKON POS';
         $data['currentPage'] = 'Dashboard';
 
-        // Generate menu (TODO: implement dynamic menu)
-        $data["menu_generate"] = $this->generateMenu();
+        // ✅ GANTI BARIS INI:
+        // $data["menu_generate"] = $this->generateMenu();  // ❌ HAPUS INI
+        $data["menu_generate"] = $this->getTemporaryMenu();  // ✅ GANTI JADI INI
 
         // Create form filter
         $data['form'] = $this->createFormDashboard();
         $data['grid'] = '';
+
+        // ✅ TAMBAH DEBUG:
+        log_message('debug', '🔥 SEKAR Home: menu_generate type = ' . gettype($data['menu_generate']));
+        log_message('debug', '🔥 SEKAR Home: menu_generate length = ' . strlen($data['menu_generate']));
 
         return view('dashboard/index', $data);
     }

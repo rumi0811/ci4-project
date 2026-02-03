@@ -2,15 +2,13 @@
 <html lang="en-us">
 
 <head>
-    <title><?= $title ?? 'IKON POS' ?></title>
-    <?= view('layout/includes/header_script') ?>
-    <?php if (isset($header_script) && $header_script != ''): ?>
-        <?= $header_script ?>
-    <?php endif; ?>
+    <title><?php echo isset($currentPage["page_name"]) ? $currentPage["page_name"] : 'Group'; ?></title>
+    <?php echo view("includes/header_script_full"); ?>
+    <?php if (isset($header_script) && $header_script != '') echo $header_script; ?>
 </head>
 
 <body class="mod-bg-1 mod-nav-link mod-skin-light">
-    <?= view('layout/includes/after_body_script') ?>
+    <?php echo view("includes/after_body_script"); ?>
 
     <!-- BEGIN Page Wrapper -->
     <div class="page-wrapper">
@@ -19,7 +17,7 @@
             <aside class="page-sidebar">
                 <div class="page-logo">
                     <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
-                        <img src="<?= session()->get('company_image_logo') ?? base_url('assets/img/logo.png') ?>" alt="Company Logo" aria-roledescription="logo" style="height: 40px!important; width: auto!important">
+                        <img src="<?php echo session()->get('company_image_logo'); ?>" alt="Company Logo" aria-roledescription="logo" style="height: 40px!important; width: auto!important">
                         <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
                         <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
                     </a>
@@ -36,38 +34,22 @@
                         </div>
                     </div>
                     <div class="info-card">
-                        <img src="<?= session()->get('profile_picture') ?? base_url('assets/img/user/default.png') ?>" alt="Profile Picture" class="profile-image rounded-circle" />
+                        <img src="<?php echo session()->get('profile_picture'); ?>" alt="Profile Picture" class="profile-image rounded-circle" />
                         <div class="info-card-text">
                             <a href="#" class="d-flex align-items-center text-white">
                                 <span class="text-truncate text-truncate-sm d-inline-block">
-                                    <?= session()->get('name') ?? 'User' ?>
+                                    <?php echo session()->get('name'); ?>
                                 </span>
                             </a>
-                            <span class="d-inline-block text-truncate text-truncate-sm"><?= session()->get('username') ?? 'username' ?></span>
+                            <span class="d-inline-block text-truncate text-truncate-sm"><?php echo session()->get('username'); ?></span>
                         </div>
-                        <img src="<?= base_url('assets/4.5.1/img/card-backgrounds/cover-2-lg.png') ?>" class="cover" alt="cover">
+                        <img src="<?php echo base_url(); ?>assets/4.5.1/img/card-backgrounds/cover-2-lg.png" class="cover" alt="cover">
                         <a href="#" onclick="return false;" class="pull-trigger-btn" data-action="toggle" data-class="list-filter-active" data-target=".page-sidebar" data-focus="nav_filter_input">
                             <i class="fal fa-angle-down"></i>
                         </a>
                     </div>
 
-                    <?php
-                    // DEBUG: Cek apakah $menu_generate ada
-                    echo "\n<!-- DEBUG: menu_generate isset = " . (isset($menu_generate) ? 'YES' : 'NO') . " -->\n";
-                    if (isset($menu_generate)) {
-                        echo "<!-- DEBUG: menu_generate type = " . gettype($menu_generate) . " -->\n";
-                        echo "<!-- DEBUG: menu_generate length = " . (is_string($menu_generate) ? strlen($menu_generate) : 0) . " -->\n";
-                    }
-
-                    if (isset($menu_generate) && is_string($menu_generate)) {
-                        echo "<!-- DEBUG: Rendering menu HTML -->\n";
-                        echo $menu_generate;
-                    } else {
-                        echo "<!-- DEBUG: menu_generate NOT SET or NOT STRING, showing empty menu -->\n";
-                        echo '<ul id="js-nav-menu" class="nav-menu"></ul>';
-                    }
-                    ?>
-
+                    <?php echo $menu_generate; ?>
 
                     <div class="filter-message js-filter-message bg-success-600"></div>
                 </nav>
@@ -88,8 +70,8 @@
                     <!-- we need this logo when user switches to nav-function-top -->
                     <div class="page-logo">
                         <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
-                            <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo" aria-roledescription="logo">
-                            <span class="page-logo-text mr-1">IKON POS</span>
+                            <img src="<?php echo base_url(); ?>assets/img/logo.png" alt="Logo" aria-roledescription="logo">
+                            <span class="page-logo-text mr-1">SmartAdmin WebApp</span>
                             <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
                             <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
                         </a>
@@ -122,26 +104,26 @@
 
                         <!-- app user menu -->
                         <div>
-                            <a href="#" data-toggle="dropdown" title="<?= session()->get('username') ?? 'user' ?>" class="header-icon d-flex align-items-center justify-content-center ml-2">
-                                <img src="<?= session()->get('profile_picture') ?? base_url('assets/img/user/default.png') ?>" class="profile-image rounded-circle" style="width: 2rem!important; height: 2rem!important;">
+                            <a href="#" data-toggle="dropdown" title="drlantern@gotbootstrap.com" class="header-icon d-flex align-items-center justify-content-center ml-2">
+                                <img src="<?php echo session()->get('profile_picture'); ?>" class="profile-image rounded-circle" style="width: 2rem!important; height: 2rem!important;">
                             </a>
                             <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
                                 <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
                                     <div class="d-flex flex-row align-items-center mt-1 mb-1 color-white">
                                         <span class="mr-2">
-                                            <img src="<?= session()->get('profile_picture') ?? base_url('assets/img/user/default.png') ?>" class="rounded-circle profile-image" style="width: 3.125rem!important; height: 3.125rem!important;">
+                                            <img src="<?php echo session()->get('profile_picture'); ?>" class="rounded-circle profile-image" style="width: 3.125rem!important; height: 3.125rem!important;">
                                         </span>
                                         <div class="info-card-text">
-                                            <div class="fs-lg text-truncate text-truncate-lg"><?= session()->get('username') ?? 'username' ?></div>
-                                            <span class="text-truncate text-truncate-md opacity-80"><?= session()->get('name') ?? 'User Name' ?></span>
+                                            <div class="fs-lg text-truncate text-truncate-lg"><?php echo session()->get('username'); ?></div>
+                                            <span class="text-truncate text-truncate-md opacity-80"><?php echo session()->get('name'); ?></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="dropdown-divider m-0"></div>
-                                <a href="<?= base_url('user/info') ?>" class="dropdown-item">
+                                <a href="<?php echo base_url(); ?>user/info" class="dropdown-item">
                                     <span>Edit Profile</span>
                                 </a>
-                                <a href="<?= base_url('user/change_password') ?>" class="dropdown-item">
+                                <a href="<?php echo base_url(); ?>user/change_password" class="dropdown-item">
                                     <span>Change Password</span>
                                 </a>
                                 <div class="dropdown-divider m-0"></div>
@@ -158,9 +140,9 @@
                                     <i class="float-right text-muted fw-n">Ctrl + P</i>
                                 </a>
                                 <div class="dropdown-divider m-0"></div>
-                                <a class="dropdown-item fw-500 pt-3 pb-3" href="<?= base_url('logout') ?>">
+                                <a class="dropdown-item fw-500 pt-3 pb-3" href="<?php echo base_url(); ?>logout">
                                     <span data-i18n="drpdwn.page-logout">Logout</span>
-                                    <span class="float-right fw-n"><?= session()->get('username') ?? 'username' ?></span>
+                                    <span class="float-right fw-n"><?php echo session()->get('username'); ?></span>
                                 </a>
                             </div>
                         </div>
@@ -173,52 +155,49 @@
                 <main id="js-page-content" role="main" class="page-content">
                     <ol class="breadcrumb page-breadcrumb">
                         <li class="breadcrumb-item">
-                            <a href="<?= base_url('dashboard') ?>">Home</a>
+                            <a href="<?php echo base_url(); ?>dashboard">Home</a>
                         </li>
-                        <?php if (isset($currentPage)): ?>
-                            <?php if (isset($currentPage["parent_menu_name"]) && $currentPage["parent_menu_name"] != ""): ?>
-                                <?php if ($currentPage["parent_menu_file_name"] != ""): ?>
-                                    <li class="breadcrumb-item"><a href="<?= base_url($currentPage["parent_menu_file_name"]) ?>"><?= $currentPage["parent_menu_name"] ?></a></li>
-                                <?php else: ?>
-                                    <li class="breadcrumb-item"><?= $currentPage["parent_menu_name"] ?></li>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                            <?php if (isset($currentPage["menu_name"]) && $currentPage["menu_name"] != "Home"): ?>
+                        <?php
+                        if (isset($currentPage)) {
+                            if (isset($currentPage["parent_menu_name"]) && $currentPage["parent_menu_name"] != "") {
+                                if ($currentPage["parent_menu_file_name"] != "")
+                                    echo "<li class=\"breadcrumb-item\"><a href=\"" . base_url() . $currentPage["parent_menu_file_name"] . "\">" . $currentPage["parent_menu_name"] . "</a></li>";
+                                else
+                                    echo "<li class=\"breadcrumb-item\">" . $currentPage["parent_menu_name"] . "</li>";
+                            }
+                            if (isset($currentPage["menu_name"]) && $currentPage["menu_name"] != "Home") {
+                        ?>
                                 <li class="breadcrumb-item active">
-                                    <?= $currentPage["menu_name"] ?>
+                                    <?php echo $currentPage["menu_name"]; ?>
                                 </li>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                        <?php
+                            }
+                        }
+                        ?>
                         <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
                     </ol>
-                    <?php if (isset($contents)): ?>
-                        <?= $contents ?>
-                    <?php else: ?>
-                        <?= $this->renderSection('content') ?>
-                    <?php endif; ?>
 
+                    <?php echo $contents; ?>
                 </main>
 
                 <!-- this overlay is activated only when mobile menu is triggered -->
                 <div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div> <!-- END Page Content -->
 
 
-                <?= view('layout/includes/footer') ?>
-                <?= view('layout/includes/shortcut') ?>
-                <?= view('layout/includes/color_profile') ?>
+                <?php echo view('includes/layout_footer'); ?>
+                <?php echo view('includes/layout_shortcut'); ?>
+                <?php echo view("includes/color_profile_script"); ?>
 
             </div>
         </div>
     </div>
     <!-- END Page Wrapper -->
 
-    <?= view('layout/includes/page_setting') ?>
+    <?php echo view("includes/layout_page_setting"); ?>
 
-    <?= view('layout/includes/footer_script') ?>
+    <?php echo view("includes/footer_script"); ?>
 
-    <?php if (isset($scripts)): ?>
-        <?= $scripts ?>
-    <?php endif; ?>
+    <?php if (isset($scripts)) echo $scripts; ?>
 
 
 </body>

@@ -23,12 +23,12 @@ class UserType extends MasterDataMongoController
         return $this->datatable();
     }
 
-    protected function on_before_save($record)
+    protected function onBeforeSave($record)
     {
         return $record;
     }
 
-    protected function on_success_save($oldRecord, $newRecord)
+    protected function onSuccessSave($oldRecord, $newRecord)
     {
         // Custom logic after save (if needed)
     }
