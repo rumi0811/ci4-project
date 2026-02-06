@@ -17,7 +17,7 @@
             <aside class="page-sidebar">
                 <div class="page-logo">
                     <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
-                        <img src="<?php echo session()->get('company_image_logo'); ?>" alt="Company Logo" aria-roledescription="logo" style="height: 40px!important; width: auto!important">
+                        <img src="<?php echo session()->get('company_image_logo') ?: base_url('assets/img/logo.png'); ?>" alt="Company Logo" aria-roledescription="logo" style="height: 40px!important; width: auto!important">
                         <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
                         <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
                     </a>
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="info-card">
-                        <img src="<?php echo session()->get('profile_picture'); ?>" alt="Profile Picture" class="profile-image rounded-circle" />
+                        <img src="<?php echo session()->get('profile_picture') ?: base_url('assets/img/user/default.png'); ?>" alt="Profile Picture" class="profile-image rounded-circle" />
                         <div class="info-card-text">
                             <a href="#" class="d-flex align-items-center text-white">
                                 <span class="text-truncate text-truncate-sm d-inline-block">
@@ -105,13 +105,13 @@
                         <!-- app user menu -->
                         <div>
                             <a href="#" data-toggle="dropdown" title="drlantern@gotbootstrap.com" class="header-icon d-flex align-items-center justify-content-center ml-2">
-                                <img src="<?php echo session()->get('profile_picture'); ?>" class="profile-image rounded-circle" style="width: 2rem!important; height: 2rem!important;">
+                                <img src="<?php echo session()->get('profile_picture') ?: base_url('assets/img/user/default.png'); ?>" class="profile-image rounded-circle" style="width: 2rem!important; height: 2rem!important;">
                             </a>
                             <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
                                 <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
                                     <div class="d-flex flex-row align-items-center mt-1 mb-1 color-white">
                                         <span class="mr-2">
-                                            <img src="<?php echo session()->get('profile_picture'); ?>" class="rounded-circle profile-image" style="width: 3.125rem!important; height: 3.125rem!important;">
+                                            <img src="<?php echo session()->get('profile_picture') ?: base_url('assets/img/user/default.png'); ?>" class="rounded-circle profile-image" style="width: 3.125rem!important; height: 3.125rem!important;">
                                         </span>
                                         <div class="info-card-text">
                                             <div class="fs-lg text-truncate text-truncate-lg"><?php echo session()->get('username'); ?></div>

@@ -41,17 +41,13 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-
-
 		$("#btnSave_form1").click(function(e) {
 			// Set submitButton value manually
 			$('input[name=submitButton_form1]').val('btnSave_form1');
 
 			SaveConfirmationFormAndSubmit(e, $('#form1'), 'Save', "Do you want to save this data?", null, true);
 		});
-
 	});
-
 
 	var printGroupType = function(data) {
 		if (data == 0) return "Internal";
@@ -62,7 +58,6 @@
 	var printActionMembers = function(group_id, type, row) {
 		return '<a class="btn btn-xs btn-success text-white" onClick="javascript:doOpenMember(' + group_id + ')"><i class="fal fa-list"></i> Set User (' + row.total_user + ')</a>';
 	};
-
 
 	var doOpenPrivilege = function(id) {
 		var f = $('#formDummy');
@@ -76,27 +71,30 @@
 		f.submit();
 	};
 
-
 	var editForm = function(id) {
 		$("#modal_panel").modal();
 		if (id == 0) {
 			<?php
 			foreach ($fieldStructure as $key => $val) {
 				if ($val == 'boolean') {
-					echo '				$("#' . $key . '_' . $formName . '_1").prop("checked", false);';
+					echo '$("#' . $key . '_' . $formName . '_1").prop("checked", false);' . "\n";
 				} else {
-					echo '				$("#' . $key . '_' . $formName . '").val("");';
+					echo '$("#' . $key . '_' . $formName . '").val("");' . "\n";
 				}
-				echo "\n";
 			}
-			echo '				$("#' . $formName . ' .select2").trigger("change");';
+			echo '$("#' . $formName . ' .select2").trigger("change");' . "\n";
 			?>
 			$('#form1').removeClass('was-validated');
 		} else {
 			$("#modalLoadingInfo").css("display", "block");
+
 			url = "<?php echo base_url(); ?>group/edit/" + id;
-			var jqxhr = $.get(url, function(data) {
-					var obj = $.parseJSON(data);
+
+			$.ajax({
+				url: url,
+				type: 'GET',
+				dataType: 'json',
+				success: function(obj) {
 					if (typeof(obj.error_message) != 'undefined') {
 						toastr['error'](obj.error_message);
 						$("#modal_panel").modal('hide');
@@ -104,39 +102,174 @@
 						<?php
 						foreach ($fieldStructure as $key => $val) {
 							if ($val == 'boolean') {
-								echo '				$("#' . $key . '_' . $formName . '_1").prop("checked", (obj.' . $key . ' == 1));';
+								echo '$("#' . $key . '_' . $formName . '_1").prop("checked", (obj.' . $key . ' == 1));' . "\n";
 							} else {
-								echo '				$("#' . $key . '_' . $formName . '").val(obj.' . $key . ');';
+								echo '$("#' . $key . '_' . $formName . '").val(obj.' . $key . ');' . "\n";
 							}
-							echo "\n";
 						}
-						echo '				$("#' . $formName . ' .select2").trigger("change");';
+						echo '$("#' . $formName . ' .select2").trigger("change");' . "\n";
 						?>
 						$('#form1').addClass('was-validated');
 					}
-				})
-				.fail(function() {
-
-				})
-				.always(function() {
+				},
+				error: function(xhr, status, error) {
+					console.error('Edit form error:', error);
+					toastr['error']('Failed to load data');
+					$("#modal_panel").modal('hide');
+				},
+				complete: function() {
 					$("#modalLoadingInfo").css("display", "none");
-				});
+				}
+			});
 		}
 	}
 
-	// var deleteConfirm = function(e, id)
-	// {
-	// 	DeleteConfirmation(
-	// 		function() {
-	// 			$("#group_id_delete").val(id);
-	// 			$("#form_delete").submit();
-	// 		}
-	// 	);
-	// };
+	function deleteConfirm(fieldName, id) {
+		console.log('deleteConfirm called with ID:', id);
+
+		Swal.fire({
+			title: 'Are you sure?',
+			text: "You want to delete this record?",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!',
+			cancelButtonText: 'Cancel'
+		}).then((result) => {
+			console.log('SweetAlert result:', result);
+			console.log('result.value:', result.value);
+			console.log('result.isConfirmed:', result.isConfirmed);
+
+			// Support both old and new SweetAlert versions
+			if (result.value === true || result.isConfirmed === true) {
+				console.log('Calling deleteRow with ID:', id);
+				deleteRow(id);
+			} else {
+				console.log('Delete cancelled');
+			}
+		});
+	}
+
+	function deleteRow(id) {
+		console.log('deleteRow called with ID:', id);
+
+		$.ajax({
+			url: '<?php echo base_url(); ?>group/delete_data',
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				id: id
+			},
+			success: function(response) {
+				console.log('Delete SUCCESS:', response);
+
+				// ✅ GANTI: Pakai SweetAlert
+				Swal.fire({
+					icon: 'success',
+					title: 'Deleted!',
+					text: 'Data deleted successfully!',
+					timer: 1500,
+					showConfirmButton: false
+				}).then(function() {
+					window.location.href = '<?php echo base_url(); ?>group';
+				});
+			},
+			error: function(xhr, status, error) {
+				console.error('Delete ERROR:', error);
+				console.log('XHR:', xhr);
+
+				// ✅ GANTI: Pakai SweetAlert
+				Swal.fire({
+					icon: 'error',
+					title: 'Error!',
+					text: 'Error deleting data: ' + error
+				});
+			}
+		});
+	}
 
 	function printBoolean(data, type, full) {
 		if (data == 1) return "Yes";
 		else if (data == 0) return "No";
 		else return "";
 	}
+
+	// ✅ OVERRIDE DELETE BUTTON - LANGSUNG TANPA SWEETALERT DULU
+	// ✅ OVERRIDE DELETE BUTTON - PAKAI SWEETALERT
+	$(document).on('click', '.btn-delete-DataGrid1', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		console.log('Delete button clicked!');
+
+		var groupId = null;
+		var row = $(this).closest('tr');
+
+		// Cari button Privileges di row yang sama
+		var privilegeBtn = row.find('a[onclick*="doOpenPrivilege"]');
+
+		if (privilegeBtn.length > 0) {
+			var onclick = privilegeBtn.attr('onclick');
+			console.log('Privilege button onclick:', onclick);
+
+			var match = onclick.match(/\d+/);
+			if (match) {
+				groupId = parseInt(match[0]);
+				console.log('ID extracted from Privilege button:', groupId);
+			}
+		}
+
+		// Fallback: cari dari button Members
+		if (!groupId) {
+			var memberBtn = row.find('a[onclick*="doOpenMember"]');
+			if (memberBtn.length > 0) {
+				var onclick = memberBtn.attr('onclick');
+				console.log('Member button onclick:', onclick);
+
+				var match = onclick.match(/\d+/);
+				if (match) {
+					groupId = parseInt(match[0]);
+					console.log('ID extracted from Member button:', groupId);
+				}
+			}
+		}
+
+		console.log('Final Group ID:', groupId);
+
+		if (groupId && groupId > 0) {
+			// ✅ PAKAI SWEETALERT - KONSISTEN DENGAN STYLE YANG ADA
+			Swal.fire({
+				title: 'Are you sure?',
+				text: "You want to delete this record?",
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Yes, delete it!',
+				cancelButtonText: 'Cancel'
+			}).then((result) => {
+				console.log('SweetAlert result:', result);
+
+				// Support both old and new SweetAlert versions
+				if (result.value === true || result.isConfirmed === true) {
+					console.log('Delete confirmed! Calling deleteRow...');
+					deleteRow(groupId);
+				} else {
+					console.log('Delete cancelled');
+				}
+			});
+		} else {
+			console.error('Cannot find valid group ID');
+
+			// ✅ PAKAI SWEETALERT UNTUK ERROR MESSAGE
+			Swal.fire({
+				icon: 'error',
+				title: 'Error!',
+				text: 'Cannot find Group ID. Check console.'
+			});
+		}
+
+		return false;
+	});
 </script>

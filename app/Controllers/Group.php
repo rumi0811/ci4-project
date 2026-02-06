@@ -75,7 +75,7 @@ class Group extends MYController
                 $this->datagrid->addRowButtonEdit($this->PKField, 'javascript', 'editForm(data.' . $this->PKField . ');');
             }
             if ($this->privilegeDelete) {
-                $this->datagrid->addRowButtonDelete($this->PKField, 'm_group');
+                $this->datagrid->addRowButtonDelete($this->PKField, 'group/delete_data');
             }
 
             $this->datagrid->addActionColumn(
@@ -144,16 +144,26 @@ class Group extends MYController
             }
 
             if (isset($_GET['ajaxDataGrid1'])) {
-                // update log finish load datagrid
-
-                // Get MongoDB connection for counting total users
+                // Bind table tanpa filter dulu (ambil semua data)
                 $this->datagrid->bindTable("m_group");
+
+                // Ambil reference ke dataset
                 $arrResult = &$this->datagrid->dataset['data'];
-                foreach ($arrResult as &$row) {
-                    // Temporary: skip counting users
-                    $row['total_user'] = 0;
+
+                // Filter manual: tampilkan HANYA yang TIDAK deleted
+                $filteredResult = [];
+                foreach ($arrResult as $row) {
+                    // Kondisi: tampilkan jika _deleted tidak ada ATAU _deleted != 1
+                    if (!isset($row['_deleted']) || $row['_deleted'] != 1) {
+                        $row['total_user'] = 0;
+                        $filteredResult[] = $row;
+                    }
                 }
-                unset($row);
+
+                // Replace dataset dengan hasil filter
+                $this->datagrid->dataset['data'] = $filteredResult;
+                $this->datagrid->dataset['recordsTotal'] = count($filteredResult);
+                $this->datagrid->dataset['recordsFiltered'] = count($filteredResult);
             }
 
             $data["grid"] = $this->datagrid->generate();
@@ -292,12 +302,16 @@ class Group extends MYController
                 }
             } else {
                 //insert
+                //insert
                 $record["created"] = date("Y-m-d H:i:s");
                 $record["created_by"] = session()->get('user_id');
-                unset($record[$this->PKField]);
-                if ($record[$this->PKField] = $this->mGroup->insert($record)) {
-                    $id = $record[$this->PKField];
+                $record["company_id"] = session()->get('company_id');
+                unset($record[$this->PKField]); // Hapus PK field biar auto-increment jalan
+
+                $newId = $this->mGroup->insert($record); // INSERT dan dapat ID baru
+                if ($newId > 0) {
                     $result["message"] = "New data saved";
+                    $result["new_id"] = $newId; // Return ID baru ke client
                 } else {
                     $result["error_message"] = "Failed to save new data";
                 }
@@ -306,6 +320,27 @@ class Group extends MYController
             $result['error_message'] = 'Failed to save';
         }
         return $this->response->setJSON($result);
+    }
+
+    // CI4
+    public function delete_data()
+    {
+        $request = service('request');  // ← CI4 syntax
+        if ($request->getPost('id')) {  // ← CI4 syntax
+            $id = intval($request->getPost('id'));
+
+            $record = array(
+                '_deleted' => 1,  // ← LOGIC SAMA!
+                'modified' => date("Y-m-d H:i:s"),
+                'modified_by' => session()->get('user_id')  // ← CI4 syntax
+            );
+
+            if ($this->mGroup->update(array($this->PKField => $id), $record)) {
+                $result["message"] = "Data deleted successfully";
+            }
+        }
+
+        return $this->response->setJSON($result);  // ← CI4 cara return JSON
     }
 
     // public function edit($id = 0)
