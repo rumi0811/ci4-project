@@ -170,3 +170,25 @@ $routes->group('group', ['filter' => 'auth'], function ($routes) {
     $routes->get('(:any)', 'Group::$1');
     $routes->post('(:any)', 'Group::$1');
 });
+
+// Menu routes
+$routes->get('menu', 'Menu::index');
+$routes->post('menu', 'Menu::index');
+$routes->post('menu/datatable', 'Menu::datatable');
+$routes->get('menu/edit/(:num)', 'Menu::edit/$1');
+
+// User routes
+$routes->get('user', 'User::index');
+$routes->post('user', 'User::index');
+$routes->match(['get', 'post'], 'user/datatable', 'User::datatable');
+$routes->match(['get', 'post'], 'user/edit/(:num)', 'User::edit/$1');
+$routes->match(['get', 'post'], 'user/edit', 'User::edit');
+$routes->match(['get', 'post'], 'user/info', 'User::info');
+$routes->match(['get', 'post'], 'user/change_password', 'User::change_password');
+$routes->match(['get', 'post'], 'user/change_email', 'User::change_email');
+$routes->get('user/getdata_user', 'User::getdata_user');
+$routes->post('user/upload_doc', 'User::upload_doc');
+
+
+$routes->get('testuser', 'TestUser::index');
+$routes->match(['get', 'post'], 'testuser/datatable', 'TestUser::datatable');

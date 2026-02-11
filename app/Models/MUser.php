@@ -97,25 +97,81 @@ class MUser extends MyMongoModel
         return $this->findByUserId(intval($userId), "token, timestamp");
     }
 
+    public function findByUserId($userId, $fields = null)
+    {
+        $criteria = ['user_id' => intval($userId)];
+
+        $results = $this->findAll($criteria, $fields, null, 1);
+
+        if (!empty($results)) {
+            foreach ($results as $row) {
+                // Convert BSONDocument to array
+                if ($row instanceof \MongoDB\Model\BSONDocument) {
+                    $row = $row->getArrayCopy();  // ← CONVERT!
+                } elseif (is_object($row)) {
+                    $row = (array)$row;  // Fallback
+                }
+
+                // Add default values for ALL possibly missing fields
+                $defaults = [
+                    'pp_code' => '',
+                    'mobile' => '',
+                    'address' => '',
+                    'device_id' => '',
+                    'referral_user_id' => 0,
+                    'email_verified' => 0,
+                    'is_send_mail' => 0,
+                    'is_account_verified' => 0,
+                    'user_note' => '',
+                    'telegram_id' => '',
+                    'balance' => 0,
+                    'price_id' => 0,
+                    'email' => '',
+                    'profile_picture' => '',
+                    'id_card_image' => '',
+                    'is_active' => 1,
+                    'user_type_id' => PP_USER
+                ];
+
+                // Merge with defaults
+                $row = array_merge($defaults, $row);
+
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
     public function getUniquePPCode()
     {
         $ppCodeHeader = date("ym") . "-";
-        $this->db->select("MAX(pp_code) AS pp_code");
-        $this->db->from($this->strTableName);
-        $this->db->where("pp_code LIKE '" . $ppCodeHeader . "%'");
 
-        if ($query = $this->db->get()) {
-            if ($row = $query->getRowArray()) {
-                $num = str_replace($ppCodeHeader, "", $row["pp_code"]);
-                $num = intval($num) + 1;
-                if ($num <= 9999) {
-                    return $ppCodeHeader . str_pad($num, 4, "0", STR_PAD_LEFT);
-                } else {
-                    return $ppCodeHeader . $num;
+        // Use existing findAll method with regex
+        $criteria = [
+            'pp_code' => ['$regex' => '^' . preg_quote($ppCodeHeader), '$options' => 'i']
+        ];
+
+        $results = $this->findAll($criteria, 'pp_code', 'pp_code DESC', 1);
+
+        $num = 1;
+        if (!empty($results)) {
+            foreach ($results as $row) {
+                if (isset($row['pp_code'])) {
+                    $ppCode = (string)$row['pp_code'];
+                    $num = str_replace($ppCodeHeader, "", $ppCode);
+                    $num = intval($num) + 1;
                 }
+                break;
             }
         }
-        return $ppCodeHeader . "0001";
+
+        // Same logic as CI3
+        if ($num <= 9999) {
+            return $ppCodeHeader . str_pad($num, 4, "0", STR_PAD_LEFT);
+        } else {
+            return $ppCodeHeader . $num;
+        }
     }
 
     public function getUniqueReferralCode()

@@ -83,3 +83,18 @@ defined('USER_CUSTOMER')   || define('USER_CUSTOMER', 2);
 defined('ACTIVITY_LOGIN')       || define('ACTIVITY_LOGIN', 1);
 defined('ACTIVITY_LOGOUT')      || define('ACTIVITY_LOGOUT', 2);
 defined('ACTIVITY_TRANSACTION') || define('ACTIVITY_TRANSACTION', 3);
+
+// ===== CUSTOM CONSTANTS for IKON POS =====
+
+// User Types - Dead code constants with safe defaults
+defined('USER_TUKANG')   || define('USER_TUKANG', 3);
+defined('USER_BOTH')     || define('USER_BOTH', 4);
+defined('PP_USER')       || define('PP_USER', 2);  // Same as USER_CUSTOMER
+
+// Group constants
+defined('GROUP_USER_PP_LOKET') || define('GROUP_USER_PP_LOKET', 1);
+
+// Default Settings
+defined('DEFAULT_LANGUAGE')           || define('DEFAULT_LANGUAGE', 'id');
+defined('DEFAULT_LOGIN_CONTROLLER')   || define('DEFAULT_LOGIN_CONTROLLER', 'auth_controller');
+defined('DEFAULT_LOGIN_METHOD')       || define('DEFAULT_LOGIN_METHOD', 'login');

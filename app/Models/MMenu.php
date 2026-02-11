@@ -13,10 +13,8 @@ class MMenu extends MyMongoModel
 
     public function GetMaxLevel()
     {
-        // Load MongoDB library
         $mongoDb = new \App\Libraries\Mongo("default");
 
-        ini_set('mongo.long_as_object', 1);
         $pipeline = [
             [
                 '$group' => [
@@ -26,12 +24,18 @@ class MMenu extends MyMongoModel
             ]
         ];
 
-        if ($cursor = $mongoDb->aggregateCursor('m_menu', $pipeline, 100)) {
-            $cursor->timeout(400000);
-            foreach ($cursor as $row) {
-                return $row['menu_level'];
-            }
+        $cursor = $mongoDb->aggregate('m_menu', $pipeline);
+
+        // Convert cursor to array
+        $result = [];
+        foreach ($cursor as $row) {
+            $result[] = $row;
         }
+
+        if (!empty($result)) {
+            return $result[0]['menu_level'] ?? 0;
+        }
+
         return 0;
     }
 
@@ -39,7 +43,6 @@ class MMenu extends MyMongoModel
     {
         $mongoDb = new \App\Libraries\Mongo("default");
 
-        ini_set('mongo.long_as_object', 1);
         $pipeline = [
             [
                 '$group' => [
@@ -49,12 +52,18 @@ class MMenu extends MyMongoModel
             ]
         ];
 
-        if ($cursor = $mongoDb->aggregateCursor('m_menu', $pipeline, 100)) {
-            $cursor->timeout(400000);
-            foreach ($cursor as $row) {
-                return $row['sequence_no'];
-            }
+        $cursor = $mongoDb->aggregate('m_menu', $pipeline);
+
+        // Convert cursor to array
+        $result = [];
+        foreach ($cursor as $row) {
+            $result[] = $row;
         }
+
+        if (!empty($result)) {
+            return $result[0]['sequence_no'] ?? 0;
+        }
+
         return 0;
     }
 
@@ -63,7 +72,6 @@ class MMenu extends MyMongoModel
         $id = intval($id);
         $mongoDb = new \App\Libraries\Mongo("default");
 
-        ini_set('mongo.long_as_object', 1);
         $pipeline = [
             [
                 '$match' => ['parent_menu_id' => $id],
@@ -76,13 +84,19 @@ class MMenu extends MyMongoModel
             ]
         ];
 
-        if ($cursor = $mongoDb->aggregateCursor('m_menu', $pipeline, 100)) {
-            $cursor->timeout(400000);
-            foreach ($cursor as $row) {
-                return $row['sequence_no'];
-            }
+        $cursor = $mongoDb->aggregate('m_menu', $pipeline);
+
+        // Convert cursor to array
+        $result = [];
+        foreach ($cursor as $row) {
+            $result[] = $row;
         }
-        return [];
+
+        if (!empty($result)) {
+            return $result[0]['sequence_no'] ?? 0;
+        }
+
+        return 0;
     }
 
     public function findCountByMenuName($keyword)

@@ -414,43 +414,39 @@ class MyMongoModel
 
   public function insert($arrRecord)
   {
-    if (!isset($arrRecord[$this->strPKAutoIncrement])) {
-      $arrRecord[$this->strPKAutoIncrement] = $this->findSequenceByCollectionName($this->strTableName);
-    } else if ($arrRecord[$this->strPKAutoIncrement] == 0) {
-      $arrRecord[$this->strPKAutoIncrement] = $this->findSequenceByCollectionName($this->strTableName);
-    } else {
-      $result = 0;
-      $this->mongo_db->select(array('sequence_id'));
-      $this->mongo_db->where('collection_name', (string)$this->strTableName);
-      $query = $this->mongo_db->find($this->strTableSequence);
-      $result = 0;
-      foreach ($query as $row) {
-        $result = intval($row['sequence_id']);
+    // Manual auto increment - cari max ID
+    if (isset($this->strPKAutoIncrement) && (!isset($arrRecord[$this->strPKAutoIncrement]) || $arrRecord[$this->strPKAutoIncrement] == 0)) {
+
+      // Get collection
+      $collection = $this->mongo_db->db->selectCollection($this->strTableName);
+
+      // Find max ID
+      $maxDoc = $collection->findOne(
+        [],
+        [
+          'sort' => [$this->strPKAutoIncrement => -1],
+          'projection' => [$this->strPKAutoIncrement => 1]
+        ]
+      );
+
+      // Calculate next ID
+      $maxId = 0;
+      if ($maxDoc && isset($maxDoc[$this->strPKAutoIncrement])) {
+        $maxId = intval($maxDoc[$this->strPKAutoIncrement]);
       }
-      if ($result == 0) {
-        $this->insertSequence($this->strTableName, intval($arrRecord[$this->strPKAutoIncrement]) + 1);
-      } else {
-        if ((intval($arrRecord[$this->strPKAutoIncrement]) + 1) > $result) {
-          $this->mongo_db->set('sequence_id', intval($arrRecord[$this->strPKAutoIncrement]) + 1);
-          $this->mongo_db->where('collection_name', (string)$this->strTableName);
-          $result = $this->mongo_db->updateMany($this->strTableSequence);
-        }
-      }
+
+      // Set new ID
+      $arrRecord[$this->strPKAutoIncrement] = $maxId + 1;
     }
 
-    //check to max int 32 bit
-    if ((intval($arrRecord[$this->strPKAutoIncrement]) + 1) >= 2147400000) {
-      //set kembali ke 1
-      $this->mongo_db->set('sequence_id', 1);
-      $this->mongo_db->where('collection_name', (string)$this->strTableName);
-      $this->mongo_db->updateMany($this->strTableSequence);
-    }
-
+    // Insert to MongoDB
     $result = $this->mongo_db->insertOne($this->strTableName, $arrRecord);
     $result = $result->__toString();
+
     if ($result) {
       return $arrRecord[$this->strPKAutoIncrement];
     }
+
     return 0;
   }
 
