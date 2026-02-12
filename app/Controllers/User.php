@@ -228,6 +228,46 @@ class User extends MYController
         if ($this->loadPrivileges()) {
             $request = service('request');
 
+            // Check if Ajax request (for modal)
+            if ($request->isAJAX() || $request->getGet('ajax')) {
+                // Return JSON for modal
+                if ($id > 0) {
+                    $record = $this->mUser->findByUserId($id);
+
+                    if ($record) {
+                        // Clear password for security
+                        $record["pwd"] = "";
+
+                        return $this->response->setJSON($record);
+                    } else {
+                        return $this->response->setJSON([
+                            'error_message' => 'User not found'
+                        ]);
+                    }
+                } else {
+                    // New user - return empty data
+                    return $this->response->setJSON([
+                        "user_id" => 0,
+                        "username" => "",
+                        "pwd" => "",
+                        "pp_code" => $this->mUser->getUniquePPCode(),
+                        "name" => "",
+                        "address" => "",
+                        "email" => "",
+                        "mobile" => "",
+                        "is_active" => 1,
+                        "user_type_id" => PP_USER,
+                        "referral_user_id" => 0,
+                        "device_id" => "",
+                        "email_verified" => 0,
+                        "is_send_mail" => 0,
+                        "is_account_verified" => 0,
+                        "user_note" => ""
+                    ]);
+                }
+            }
+
+            // Original full-page view (keep for backward compatibility)
             $data["menu_generate"] = $this->getTemporaryMenu();
             $data["currentPage"] = $this->currentPage;
 
@@ -242,72 +282,6 @@ class User extends MYController
 
             $data["message"] = session()->getFlashdata('message');
             $data["error_message"] = session()->getFlashdata('error_message');
-
-            if ($request->getPost("btnCancel")) {
-                return redirect()->to($data["http_referer"]);
-            } else if ($request->getPost("btnSave") && $request->getPost("btnSave") == "1") {
-                //save
-                $record = $request->getPost();
-
-                if (!isset($record['email_verified'])) $record['email_verified'] = 0;
-                if (!isset($record['is_send_mail'])) $record['is_send_mail'] = 0;
-                if (!isset($record['is_account_verified'])) $record['is_account_verified'] = 0;
-
-                unset($record['btnSave']);
-                unset($record['btnCancel']);
-                unset($record['http_referer']);
-                unset($record['id_card_image_file']);
-                unset($record['photo_image_file']);
-                unset($record['profile_picture']);
-                unset($record['balance']);
-                unset($record['balance_hash']);
-                //unset($record['user_type_id']);
-
-                if ($record['user_id'] > 0) {
-                    //update
-                    if ($record['pwd'] == '') {
-                        unset($record['pwd']);
-                    } else {
-                        $record['pwd'] = md5($record['pwd']);
-                    }
-
-                    if (isset($record["is_active"]) && $record["is_active"] == 1) {
-                        // Clear cache if reactivating user (CI4 cache implementation would go here)
-                    }
-
-                    $record["modified"] = date("Y-m-d H:i:s");
-                    $record["modified_by"] = session()->get('user_id');
-
-                    if ($this->mUser->update(array("user_id" => intval($record["user_id"])), $record)) {
-                        $data["message"] = "Data saved";
-                    } else {
-                        $data["error_message"] = "Failed to save data";
-                    }
-                } else {
-                    //insert
-                    $record["created"] = date("Y-m-d H:i:s");
-                    $record["created_by"] = session()->get('user_id');
-                    $record['pp_code'] = $this->mUser->getUniquePPCode();
-                    $record['pwd'] = md5($record['pwd']);
-                    $record['company_id'] = session()->get('company_id');
-
-                    unset($record["user_id"]);
-
-                    if ($newUserId = $this->mUser->insert($record)) {
-                        $id = $newUserId;
-
-                        // Assign to default group
-                        $this->dUserGroup->delete(array("user_id" => $id));
-                        $this->dUserGroup->insert(array("user_id" => $id, "group_id" => GROUP_USER_PP_LOKET));
-
-                        // REDIRECT dengan flash message
-                        session()->setFlashdata('message', 'New data saved');
-                        return redirect()->to(base_url('user'));
-                    } else {
-                        $data["error_message"] = "Failed to save new data";
-                    }
-                }
-            }
 
             $data["user_types"] = $this->mUserType->generateList(null, "user_type_id", null, "user_type_id", "user_type");
 
@@ -327,13 +301,13 @@ class User extends MYController
                     "balance" => 0,
                     "price_id" => 0,
                     "referral_user_id" => 0,
-                    "device_id" => "",           // ← TAMBAH!
-                    "email_verified" => 0,       // ← TAMBAH!
-                    "is_send_mail" => 0,         // ← TAMBAH!
-                    "is_account_verified" => 0,  // ← TAMBAH!
-                    "user_note" => "",           // ← TAMBAH!
-                    "telegram_id" => "",         // ← TAMBAH (kalau ada di form)
-                    "company_id" => 0            // ← TAMBAH (kalau ada di form)
+                    "device_id" => "",
+                    "email_verified" => 0,
+                    "is_send_mail" => 0,
+                    "is_account_verified" => 0,
+                    "user_note" => "",
+                    "telegram_id" => "",
+                    "company_id" => 0
                 );
                 $record['profile_picture'] = base_url('assets/img/no_image.png');
                 $record['id_card_image_file'] = base_url('assets/img/no_image.png');
@@ -348,7 +322,6 @@ class User extends MYController
                         $record['profile_picture'] = base_url('assets/img/no_image.png');
                     }
 
-                    // Check balance hash for security
                     if (isset($record["balance_hash"]) && isset($record["balance"]) && isset($record["user_id"])) {
                         if ($record["balance_hash"] != md5($record["balance"] . "|" . $record["user_id"])) {
                             $record["balance"] = 0;
@@ -366,6 +339,79 @@ class User extends MYController
             $template_data["contents"] = view('user/edit', $data, ['saveData' => false]);
             return view('layout', $template_data);
         }
+    }
+
+    public function save_data()
+    {
+        if ($this->loadPrivileges()) {
+            $request = service('request');
+
+            try {
+                $record = $request->getPost();
+
+                // Handle checkboxes
+                if (!isset($record['email_verified'])) $record['email_verified'] = 0;
+                if (!isset($record['is_send_mail'])) $record['is_send_mail'] = 0;
+                if (!isset($record['is_account_verified'])) $record['is_account_verified'] = 0;
+
+                // Remove unwanted fields
+                unset($record['http_referer']);
+
+                if ($record['user_id'] > 0) {
+                    // UPDATE
+                    if ($record['pwd'] == '') {
+                        unset($record['pwd']);
+                    } else {
+                        $record['pwd'] = md5($record['pwd']);
+                    }
+
+                    $record["modified"] = date("Y-m-d H:i:s");
+                    $record["modified_by"] = session()->get('user_id');
+
+                    if ($this->mUser->update(array("user_id" => intval($record["user_id"])), $record)) {
+                        return $this->response->setJSON([
+                            'message' => 'Data updated successfully'
+                        ]);
+                    } else {
+                        return $this->response->setJSON([
+                            'error_message' => 'Failed to update data'
+                        ]);
+                    }
+                } else {
+                    // INSERT
+                    $record["created"] = date("Y-m-d H:i:s");
+                    $record["created_by"] = session()->get('user_id');
+                    $record['pp_code'] = $this->mUser->getUniquePPCode();
+                    $record['pwd'] = md5($record['pwd']);
+                    $record['company_id'] = session()->get('company_id');
+
+                    unset($record["user_id"]);
+
+                    if ($newUserId = $this->mUser->insert($record)) {
+                        // Assign to default group
+                        $this->dUserGroup->delete(array("user_id" => $newUserId));
+                        $this->dUserGroup->insert(array("user_id" => $newUserId, "group_id" => GROUP_USER_PP_LOKET));
+
+                        return $this->response->setJSON([
+                            'message' => 'New user created successfully',
+                            'user_id' => $newUserId
+                        ]);
+                    } else {
+                        return $this->response->setJSON([
+                            'error_message' => 'Failed to save new user'
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'error_message' => 'Error: ' . $e->getMessage()
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'error_message' => 'Access denied'
+        ]);
     }
 
     public function info()

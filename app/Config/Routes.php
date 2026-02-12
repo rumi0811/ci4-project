@@ -181,6 +181,7 @@ $routes->get('menu/edit/(:num)', 'Menu::edit/$1');
 $routes->get('user', 'User::index');
 $routes->post('user', 'User::index');
 $routes->match(['get', 'post'], 'user/datatable', 'User::datatable');
+$routes->post('user/save_data', 'User::save_data');
 $routes->match(['get', 'post'], 'user/edit/(:num)', 'User::edit/$1');
 $routes->match(['get', 'post'], 'user/edit', 'User::edit');
 $routes->match(['get', 'post'], 'user/info', 'User::info');
