@@ -464,6 +464,7 @@ class User extends MYController
             }
 
             $data['title'] = "My Information";
+            helper('smart_form');
             $record = $this->mUser->findByUserId($id);
             $record["pwd"] = "";
 
@@ -535,8 +536,10 @@ class User extends MYController
                     $data["error_message"] = "Pengguna tidak ditemukan";
                 }
             }
+            helper('smart_form');
 
             $template_data["contents"] = view('user/change_password', $data, ['saveData' => false]);
+
             return view('layout', $template_data);
         }
     }

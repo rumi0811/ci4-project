@@ -1,5 +1,5 @@
-<?php $this->load->view('includes/layout_breadcrumb'); ?>
-<?php $this->load->view('includes/layout_message'); ?>
+<?php echo view('includes/layout_breadcrumb'); ?>
+<?php echo view('includes/layout_message'); ?>
 
 <div class="row">
 	<div class="col-xl-12">
@@ -62,12 +62,11 @@
 			$("#form-cancel").submit();
 			e.preventDefault();
 		});
-		
-		$("#btnSaveDummy").click(function(e)
-		{
+
+		$("#btnSaveDummy").click(function(e) {
 			SaveConfirmationAndSubmit(e);
 		});
-		
+
 
 	});
 </script>
