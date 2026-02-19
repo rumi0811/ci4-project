@@ -26,6 +26,7 @@ class Outlets extends MasterDataMongoController
     {
         $this->hiddenGridField = array(
             'company_id',
+            'client_id',  // ← TAMBAHKAN INI JUGA!
             'note',
             'alt_phone_number',
             'city',
@@ -33,7 +34,7 @@ class Outlets extends MasterDataMongoController
             'country',
             'post_code'
         );
-        $this->datatable();
+        return $this->datatable();  // ← TAMBAHKAN return!
     }
 
     protected function onBeforeSave($record)
@@ -141,5 +142,64 @@ class Outlets extends MasterDataMongoController
         $form->addReset('btnCancel', 'Cancel', array('data-dismiss' => "modal"), true, "", "", "");
 
         return $form->render();
+    }
+
+    public function save_data()
+    {
+        $result = ['success' => 0];
+
+        if ($this->request->getMethod() == 'post') {
+            // Get model
+            $model = new \App\Models\MOutlet();
+
+            // Collect data from POST
+            $record = [];
+            foreach ($model->fieldStructure as $key => $val) {
+                if ($val != 'file' && $this->request->getPost($key) !== null) {
+                    $record[$key] = $this->request->getPost($key);
+                    if ($val == 'int' || $val == 'boolean') {
+                        $record[$key] = intval($record[$key]);
+                    }
+                }
+            }
+
+            // Call onBeforeSave
+            $record = $this->onBeforeSave($record);
+
+            if (!empty($record[$this->pk_id]) && $record[$this->pk_id] > 0) {
+                // UPDATE
+                $record["modified"] = date("Y-m-d H:i:s");
+                $record["modified_by"] = session()->get('user_id');
+
+                $pkValue = intval($record[$this->pk_id]);
+                $oldRecord = $model->find([$this->pk_id => $pkValue]);
+
+                if ($model->update([$this->pk_id => $pkValue], $record)) {
+                    $result['success'] = 1;
+                    $result['message'] = 'Data updated successfully';
+                    $this->onSuccessSave($oldRecord, $record);
+                } else {
+                    $result['error_message'] = 'Failed to update data';
+                }
+            } else {
+                // INSERT
+                $record["created"] = date("Y-m-d H:i:s");
+                $record["created_by"] = session()->get('user_id');
+                unset($record[$this->pk_id]);
+
+                if ($newId = $model->insert($record)) {
+                    $record[$this->pk_id] = $newId;
+                    $result['success'] = 1;
+                    $result['message'] = 'Data saved successfully';
+                    $this->onSuccessSave([], $record);
+                } else {
+                    $result['error_message'] = 'Failed to save data';
+                }
+            }
+        } else {
+            $result['error_message'] = 'Invalid request method';
+        }
+
+        return $this->response->setJSON($result);
     }
 }

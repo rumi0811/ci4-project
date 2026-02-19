@@ -81,6 +81,8 @@ $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Home::index', ['filter' => 'auth']);
 $routes->post('home/datatable', 'Home::datatable');
 
+
+
 // Product Item routes (RESTORE!)
 $routes->group('product_item', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'ProductItem::index');
@@ -103,17 +105,33 @@ $routes->group('tax', ['filter' => 'auth'], function ($routes) {
 // Uom routes (ADD!)
 $routes->group('uom', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'Uom::index');
+    $routes->post('/', 'Uom::index');
     $routes->post('save_data', 'Uom::save_data');
     $routes->post('delete_data', 'Uom::delete_data');
     $routes->get('(:any)', 'Uom::$1');
     $routes->post('(:any)', 'Uom::$1');
 });
 
+// Cashier routes (ADD THIS!)
+$routes->group('cashier_user', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'Cashier::index');
+    $routes->post('/', 'Cashier::index'); // untuk AJAX DataTable
+    $routes->post('save_data', 'Cashier::save_data');
+    $routes->post('delete_data', 'Cashier::delete_data');
+    $routes->get('edit/(:num)', 'Cashier::edit/$1');
+    $routes->post('edit/(:num)', 'Cashier::edit/$1');
+    $routes->get('(:any)', 'Cashier::$1');
+    $routes->post('(:any)', 'Cashier::$1');
+});
+
 // Product Category routes
 $routes->group('product_category', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'ProductCategory::index');
+    $routes->post('/', 'ProductCategory::index'); // ← TAMBAHKAN INI! (untuk AJAX DataTable)
     $routes->post('save_data', 'ProductCategory::save_data');
     $routes->post('delete_data', 'ProductCategory::delete_data');
+    $routes->post('edit/(:num)', 'ProductCategory::edit/$1');
+    $routes->get('edit/(:num)', 'ProductCategory::edit/$1');
     $routes->get('(:any)', 'ProductCategory::$1');
     $routes->post('(:any)', 'ProductCategory::$1');
 });
@@ -121,8 +139,11 @@ $routes->group('product_category', ['filter' => 'auth'], function ($routes) {
 // Outlets routes
 $routes->group('outlets', ['filter' => 'auth'], function ($routes) {
     $routes->get('/', 'Outlets::index');
+    $routes->post('/', 'Outlets::index'); // untuk AJAX DataTable
     $routes->post('save_data', 'Outlets::save_data');
     $routes->post('delete_data', 'Outlets::delete_data');
+    $routes->get('edit/(:num)', 'Outlets::edit/$1');
+    $routes->post('edit/(:num)', 'Outlets::edit/$1');
     $routes->get('(:any)', 'Outlets::$1');
     $routes->post('(:any)', 'Outlets::$1');
 });
@@ -193,3 +214,16 @@ $routes->post('user/upload_doc', 'User::upload_doc');
 
 $routes->get('testuser', 'TestUser::index');
 $routes->match(['get', 'post'], 'testuser/datatable', 'TestUser::datatable');
+
+
+// Payment Configuration routes
+$routes->group('payment_configuration', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'PaymentConfiguration::index');
+    $routes->post('/', 'PaymentConfiguration::index'); // untuk AJAX DataTable
+    $routes->post('save_data', 'PaymentConfiguration::save_data');
+    $routes->post('delete_data', 'PaymentConfiguration::delete_data');
+    $routes->get('edit/(:num)', 'PaymentConfiguration::edit/$1');
+    $routes->post('edit/(:num)', 'PaymentConfiguration::edit/$1');
+    $routes->get('(:any)', 'PaymentConfiguration::$1');
+    $routes->post('(:any)', 'PaymentConfiguration::$1');
+});

@@ -22,7 +22,7 @@ class Uom extends MasterDataMongoController
     public function index()
     {
         $this->hiddenGridField = array('company_id');
-        $this->datatable();
+        return $this->datatable();
     }
 
     protected function onBeforeSave($record)

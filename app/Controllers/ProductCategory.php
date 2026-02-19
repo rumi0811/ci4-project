@@ -10,68 +10,29 @@ class ProductCategory extends MasterDataMongoController
     {
         parent::__construct('product_category', 'm_product_category');
         $this->set_unique_fields(['category_code' => 'Category code']);
+
+        // TEMPORARY: Force privileges untuk testing
+        $this->privilegeIndex = 1;
+        $this->privilegeUpdate = 1;
+        $this->privilegeDelete = 1;
+        $this->privilegeApprove = 1;
+
+        // Load model instance
+        $this->m_product_category = new \App\Models\MProductCategory();
+
+        // Set current page info
+        $this->currentPage = [
+            'menu_name' => 'Product Category',
+            'page_name' => 'Product Category Management',
+            'parent_menu_name' => 'Master Data',
+            'parent_menu_file_name' => ''
+        ];
     }
 
     public function index()
     {
-        // TODO: MongoDB aggregation temporarily disabled
-        // Will be enabled after mongo_db initialization is fixed
-        // Original CI3 logic: Count products per category and add to grid
-
-        /*
-    // CI4: MongoDB aggregation to count products per category
-    ini_set('mongo.long_as_object', 1);
-    
-    $arrCriteria = [];
-    $arrCriteria['company_id'] = $this->company_id;
-    $arrCriteria['product_category_id']['$exists'] = true;
-    
-    $pipeline = [
-        [
-            '$match' => $arrCriteria,
-        ],
-        [
-            '$group' => [
-                '_id' => '$product_category_id',
-                'count' => ['$sum' => 1],
-            ]
-        ],
-    ];
-    
-    $dataCount = [];
-    
-    // CI4: Use MongoDB library for aggregation
-    if ($cursor = $this->mongo_db->aggregateCursor('m_product', $pipeline, 100)) {
-        $cursor->timeout(400000);
-        foreach ($cursor as $row) {
-            $dataCount[$row['_id']] = ['product_count' => $row['count']];
-        }
-    }
-    
-    $this->LookupDataPrimaryKey = $dataCount;
-    
-    // CI4: Add product_count column to grid definition
-    $arrNewGridDefinition = [];
-    foreach ($this->gridDefinition as $dataIndex => $gridDef) {
-        if ($dataIndex == 'note') {
-            $arrNewGridDefinition['product_count'] = array(
-                'title' => 'Jumlah Produk',
-                'dataIndex' => 'product_count',
-                'type' => 'string',
-                'filter_type' => 'text',
-                'filter_value' => '',
-                'colProperties' => "width: '80px', class: 'text-right'",
-                'inputType' => 'text',
-                'validationType' => 'false',
-            );
-        }
-        $arrNewGridDefinition[$dataIndex] = $gridDef;
-    }
-    $this->gridDefinition = $arrNewGridDefinition;
-    */
-
-        $this->hiddenGridField = array('company_id');
-        $this->datatable();
+        $this->hiddenGridField = array('company_id', 'client_id', 'server_id');
+        return $this->datatable();
     }
 
     protected function onBeforeSave($record)

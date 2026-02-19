@@ -404,6 +404,28 @@ class MYController extends Controller
         $html .= '  </a>';
         $html .= '</li>';
 
+        // My Account with children
+        $html .= '<li>';
+        $html .= '  <a href="#" title="My Account">';
+        $html .= '    <i class="fal fa-user"></i>';
+        $html .= '    <span class="nav-link-text">My Account</span>';
+        $html .= '  </a>';
+        $html .= '  <ul>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('user/info') . '" title="Edit Profile">';
+        $html .= '        <i class="fal fa-user-edit"></i>';
+        $html .= '        <span class="nav-link-text">Edit Profile</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('user/change_password') . '" title="Change Password">';
+        $html .= '        <i class="fal fa-key"></i>';
+        $html .= '        <span class="nav-link-text">Change Password</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '  </ul>';
+        $html .= '</li>';
+
         // Master Data with children
         $html .= '<li>';
         $html .= '  <a href="#" title="Master Data">';
@@ -413,35 +435,40 @@ class MYController extends Controller
         $html .= '  <ul>';
         $html .= '    <li>';
         $html .= '      <a href="' . base_url('product_item') . '" title="Products">';
+        $html .= ' <i class="fal fa-list"></i>';
         $html .= '        <span class="nav-link-text">Products</span>';
         $html .= '      </a>';
         $html .= '    </li>';
         $html .= '    <li>';
         $html .= '      <a href="' . base_url('product_category') . '" title="Product Category">';
+        $html .= '<i class="fal fa-calendar"></i>';
         $html .= '        <span class="nav-link-text">Product Category</span>';
+
         $html .= '      </a>';
         $html .= '    </li>';
         $html .= '    <li>';
-        $html .= '      <a href="' . base_url('master_satuan') . '" title="Master Satuan">';
+        $html .= '      <a href="' . base_url('uom') . '" title="Master Satuan">';
+        $html .= '<i class="fal fa-barcode"></i>';
         $html .= '        <span class="nav-link-text">Master Satuan</span>';
         $html .= '      </a>';
         $html .= '    </li>';
         $html .= '    <li>';
         $html .= '      <a href="' . base_url('cashier_user') . '" title="Cashier User">';
+        $html .= '<i class="fal fa-users"></i>';
         $html .= '        <span class="nav-link-text">Cashier User</span>';
         $html .= '      </a>';
         $html .= '    </li>';
-        $html .= '    <li>';
-        $html .= '      <a href="' . base_url('user_type') . '" title="User Type">';
-        $html .= '        <span class="nav-link-text">User Type</span>';
-        $html .= '      </a>';
-        $html .= '    </li>';
+        // $html .= '    <li>';
+        // $html .= '      <a href="' . base_url('user_type') . '" title="User Type">';
+        // $html .= '        <span class="nav-link-text">User Type</span>';
+        // $html .= '      </a>';
+        // $html .= '    </li>';
         $html .= '  </ul>';
         $html .= '</li>';
 
         // Gerai / Outlet
         $html .= '<li>';
-        $html .= '  <a href="' . base_url('outlet') . '" title="Gerai / Outlet">';
+        $html .= '  <a href="' . base_url('outlets') . '" title="Gerai / Outlet">';
         $html .= '    <i class="fal fa-store"></i>';
         $html .= '    <span class="nav-link-text">Gerai / Outlet</span>';
         $html .= '  </a>';
@@ -463,12 +490,32 @@ class MYController extends Controller
         $html .= '  </a>';
         $html .= '</li>';
 
-        // Reports
+        // Reports with children
         $html .= '<li>';
         $html .= '  <a href="#" title="Reports">';
-        $html .= '    <i class="fal fa-chart-line"></i>';
+        $html .= '    <i class="fal fa-chart-pie"></i>';
         $html .= '    <span class="nav-link-text">Reports</span>';
         $html .= '  </a>';
+        $html .= '  <ul>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('reports/laporan_struk_penjualan') . '" title="Laporan Struk Penjualan">';
+        $html .= '<i class="fal fa-money-bill"></i>';
+        $html .= '        <span class="nav-link-text">Laporan Struk Penjualan</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('reports/laporan_penjualan') . '" title="Laporan Penjualan">';
+        $html .= '<i class="fal fa-business-time"></i>';
+        $html .= '        <span class="nav-link-text">Laporan Penjualan</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '    <li>';
+        $html .= '      <a href="' . base_url('reports/laporan_transaksi') . '" title="Laporan Transaksi">';
+        $html .= '<i class="fal fa-briefcase"></i>';
+        $html .= '        <span class="nav-link-text">Laporan Transaksi</span>';
+        $html .= '      </a>';
+        $html .= '    </li>';
+        $html .= '  </ul>';
         $html .= '</li>';
 
         // Exit

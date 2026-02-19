@@ -50,7 +50,8 @@ abstract class MasterDataMongoController extends MYController
 
 	public function __construct($controllerName, $tableName)
 	{
-		// CI4: Get session data
+		parent::__construct();
+
 		$this->company_id = session()->get('company_id');
 		$this->user_id = session()->get('user_id');
 		$this->username = session()->get('username');
@@ -60,10 +61,8 @@ abstract class MasterDataMongoController extends MYController
 		$this->entityName = ucwords(str_replace('_', ' ', $controllerName));
 		$this->gridDefinition = $this->getTableStructure($tableName);
 
-		// ========== TAMBAH INI ==========
 		$this->datagrid = new \App\Libraries\DatagridMongo();
 		$this->datagrid->checkDeleteDataFromTable();
-		// ================================
 	}
 
 	protected function field_lookup_definition_for_column_properties()
@@ -518,7 +517,7 @@ EOF;
 
 	public function save_data()
 	{
-		if (isset($_POST['submitButton_' . $this->formName])) {
+		if ($this->request->getMethod() == 'post') {
 			//save
 			$modelName = $this->tableName;
 			//$this->load->model($modelName);
